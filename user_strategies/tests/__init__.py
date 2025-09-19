@@ -1,0 +1,3 @@
+"""
+User Strategy Tests Package
+"""
