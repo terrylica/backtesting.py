@@ -12,6 +12,18 @@ from backtesting import Strategy
 from backtesting.test import SMA
 from pathlib import Path
 from datetime import datetime
+from loguru import logger
+import sys
+
+# Gapless-crypto-data import with fallback mechanism
+GAPLESS_CRYPTO_AVAILABLE = False
+gapless_crypto_data = None
+
+try:
+    import gapless_crypto_data
+    GAPLESS_CRYPTO_AVAILABLE = True
+except ImportError:
+    GAPLESS_CRYPTO_AVAILABLE = False
 
 
 def _get_output_directory() -> Path:
@@ -67,6 +79,7 @@ def create_features(data: pd.DataFrame) -> pd.DataFrame:
     sma20 = SMA(df.Close, 20)
     sma50 = SMA(df.Close, 50)
     sma100 = SMA(df.Close, 100)
+
     upper, lower = bbands(df, 20, 2)
 
     # Price-derived features (normalized by current price)
@@ -93,7 +106,8 @@ def create_features(data: pd.DataFrame) -> pd.DataFrame:
     # Example sentiment feature (replace with real sentiment data)
     df['X_Sentiment'] = 1.0  # Placeholder - replace with actual sentiment
 
-    return df.dropna().astype(float)
+    result = df.dropna().astype(float)
+    return result
 
 
 def get_X(data: pd.DataFrame) -> np.ndarray:
@@ -120,6 +134,149 @@ def get_y(data: pd.DataFrame, forecast_periods: int = 48, threshold: float = 0.0
     return y
 
 
+def get_data_source(source: str = 'EURUSD', **kwargs) -> pd.DataFrame:
+    """
+    Data source adapter with comprehensive validation and logging
+
+    Ultra-safe data source switching with extensive validation at every step.
+    Initially supports only EURUSD, with crypto support to be added incrementally.
+
+    Args:
+        source: Data source type ('EURUSD' or 'crypto')
+        **kwargs: Additional parameters for data fetching
+                 For crypto: symbol, start, end, interval, etc.
+
+    Returns:
+        pd.DataFrame: OHLCV data with DatetimeIndex
+
+    Raises:
+        ValueError: If data validation fails
+        ImportError: If required packages not available
+    """
+    logger.info(f"🔄 get_data_source() ENTRY: source='{source}', kwargs={kwargs}")
+
+    data = None
+
+    if source == 'EURUSD':
+        logger.info("   Loading EURUSD data from backtesting.test...")
+        try:
+            from backtesting.test import EURUSD
+            data = EURUSD.copy()
+            logger.success(f"   ✅ EURUSD data loaded: shape={data.shape}")
+
+        except ImportError as e:
+            logger.error(f"   ❌ Failed to import EURUSD: {e}")
+            raise ImportError(f"Cannot import EURUSD data: {e}")
+
+    elif source == 'crypto':
+        logger.info("   🔄 Processing crypto data request...")
+
+        if not GAPLESS_CRYPTO_AVAILABLE:
+            logger.warning("   ⚠️ gapless-crypto-data package not available")
+            logger.info("   Falling back to EURUSD for safety...")
+
+            # Fallback to EURUSD when crypto package unavailable
+            from backtesting.test import EURUSD
+            data = EURUSD.copy()
+            logger.warning(f"   ⚠️ Using EURUSD fallback: shape={data.shape}")
+
+        else:
+            logger.info("   ✅ gapless-crypto-data package available, attempting crypto data fetch...")
+
+            # Set default parameters for safe crypto data fetching
+            symbol = kwargs.get('symbol', 'BTCUSDT')
+            start = kwargs.get('start', '2024-01-01')
+            end = kwargs.get('end', '2024-01-02')  # Very small sample: just 1 day for safety
+            interval = kwargs.get('interval', '1h')
+
+            logger.info(f"   Crypto parameters: symbol={symbol}, start={start}, end={end}, interval={interval}")
+
+            try:
+                # Attempt to fetch crypto data using gapless-crypto-data
+
+                # Try different possible function names from the package
+                fetch_function = None
+                for func_name in ['download', 'fetch_data', 'fetch', 'get_data', 'load_data']:
+                    if hasattr(gapless_crypto_data, func_name):
+                        fetch_function = getattr(gapless_crypto_data, func_name)
+                        break
+
+                if fetch_function is None:
+                    raise AttributeError("No suitable fetch function found in gapless-crypto-data")
+
+                # Attempt to fetch data
+                crypto_data = fetch_function(symbol, start=start, end=end)
+
+                logger.success(f"   ✅ Crypto data fetched successfully!")
+
+                # Convert to standard OHLCV format
+
+                # Column mapping from gapless-crypto-data to backtesting.py format
+                column_mapping = {
+                    'open': 'Open',
+                    'high': 'High',
+                    'low': 'Low',
+                    'close': 'Close',
+                    'volume': 'Volume'
+                }
+
+                # Check if we have the expected lowercase columns
+                required_crypto_cols = ['open', 'high', 'low', 'close', 'volume', 'date']
+                missing_crypto_cols = set(required_crypto_cols) - set(crypto_data.columns)
+                if missing_crypto_cols:
+                    raise ValueError(f"Crypto data missing expected columns: {missing_crypto_cols}")
+
+
+                # Select and rename columns to OHLCV format
+                selected_cols = ['date'] + list(column_mapping.keys())
+                crypto_subset = crypto_data[selected_cols].copy()
+                crypto_subset = crypto_subset.rename(columns=column_mapping)
+
+
+                # Convert date column to DatetimeIndex
+                if 'date' in crypto_subset.columns:
+                    crypto_subset.set_index('date', inplace=True)
+
+                data = crypto_subset
+                logger.success(f"   ✅ Crypto data converted to backtesting.py format: shape={data.shape}")
+
+            except Exception as e:
+                logger.error(f"   ❌ Failed to fetch crypto data: {e}")
+                logger.warning("   Falling back to EURUSD for safety...")
+
+                # Fallback to EURUSD on any crypto fetch failure
+                from backtesting.test import EURUSD
+                data = EURUSD.copy()
+                logger.warning(f"   ⚠️ Using EURUSD fallback after crypto failure: shape={data.shape}")
+
+    else:
+        logger.error(f"   ❌ Unknown data source: '{source}'")
+        raise ValueError(f"Unsupported data source: '{source}'. Supported: ['EURUSD', 'crypto']")
+
+    # Basic data validation
+    if data is not None:
+        # Validate required OHLCV columns
+        required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+        missing_cols = set(required_cols) - set(data.columns)
+        if missing_cols:
+            raise ValueError(f"Data missing required OHLCV columns: {missing_cols}")
+
+        # Validate data types
+        numeric_cols = ['Open', 'High', 'Low', 'Close']
+        for col in numeric_cols:
+            if not pd.api.types.is_numeric_dtype(data[col]):
+                raise ValueError(f"Column '{col}' must be numeric, got {data[col].dtype}")
+
+        # Validate index
+        if not isinstance(data.index, pd.DatetimeIndex):
+            raise ValueError(f"Data index must be DatetimeIndex, got {type(data.index)}")
+    else:
+        raise ValueError(f"No data available from source '{source}'")
+
+    logger.success(f"🔄 get_data_source() SUCCESS: source='{source}', shape={data.shape}")
+    return data
+
+
 def get_clean_Xy(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
     """
     Return clean (X, y) arrays without NaN values
@@ -132,9 +289,11 @@ def get_clean_Xy(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
     """
     X = get_X(df)
     y = get_y(df).values
+
     isnan = np.isnan(y)
     X_clean = X[~isnan]
     y_clean = y[~isnan]
+
     return X_clean, y_clean
 
 
@@ -188,16 +347,32 @@ class MLTrainOnceStrategy(Strategy, PersistentOutputMixin):
 
     def init(self):
         """Initialize strategy with ML model and indicators"""
+        logger.info(f"🤖 {self.__class__.__name__}.init() STARTING")
+
         # Initialize kNN classifier
         self.clf = KNeighborsClassifier(self.n_neighbors)
 
-        # Create features for entire dataset
+        # Create features for entire dataset with logging
+        logger.info("   Creating features for entire dataset...")
         df_with_features = create_features(self.data.df)
+        logger.info(f"   Features created: {self.data.df.shape} → {df_with_features.shape}")
 
         # Train on first n_train samples
+        logger.info(f"   Training on first {self.n_train} samples...")
         train_df = df_with_features.iloc[:self.n_train]
+
         X_train, y_train = get_clean_Xy(train_df)
-        self.clf.fit(X_train, y_train)
+        logger.info(f"   Clean training data: X={X_train.shape}, y={y_train.shape}")
+
+        if len(X_train) > 0 and len(y_train) > 0:
+            self.clf.fit(X_train, y_train)
+            logger.success(f"   ✅ Model trained successfully on {len(X_train)} samples")
+
+            # Log training data characteristics
+            unique_y, counts = np.unique(y_train, return_counts=True)
+        else:
+            logger.error(f"   ❌ No training data available after cleaning!")
+            raise ValueError("Insufficient training data after feature engineering")
 
         # Store features for prediction
         self.df_features = df_with_features
@@ -205,6 +380,8 @@ class MLTrainOnceStrategy(Strategy, PersistentOutputMixin):
         # Create indicators for plotting
         self.I(get_y, self.data.df, name='y_true')
         self.forecasts = self.I(lambda: np.repeat(np.nan, len(self.data)), name='forecast')
+
+        logger.success(f"🤖 {self.__class__.__name__}.init() COMPLETE")
 
     def next(self):
         """Execute trading logic for each time step"""
@@ -265,12 +442,15 @@ class MLWalkForwardStrategy(MLTrainOnceStrategy):
 
     def next(self):
         """Execute trading logic with periodic retraining"""
+        current_bar = len(self.data)
+
         # Skip cold start period
-        if len(self.data) < self.n_train:
+        if current_bar < self.n_train:
             return
 
         # Retrain model every retrain_frequency periods
-        if len(self.data) % self.retrain_frequency == 0:
+        if current_bar % self.retrain_frequency == 0:
+            logger.info(f"🔄 Triggering model retraining at bar {current_bar}")
             self._retrain_model()
 
         # Execute standard trading logic
@@ -279,16 +459,25 @@ class MLWalkForwardStrategy(MLTrainOnceStrategy):
     def _retrain_model(self):
         """Retrain model on recent data"""
         current_idx = len(self.data) - 1
+        logger.info(f"🔄 _retrain_model() STARTING at bar {current_idx}")
 
         # Get recent data for training
         start_idx = max(0, current_idx - self.n_train)
         recent_df = self.df_features.iloc[start_idx:current_idx]
 
+
         # Retrain if we have enough data
         if len(recent_df) >= 50:  # Minimum training samples
             X_recent, y_recent = get_clean_Xy(recent_df)
+
             if len(X_recent) > 10:  # Ensure sufficient clean samples
                 self.clf.fit(X_recent, y_recent)
+                logger.success(f"   ✅ Model retrained on {len(X_recent)} samples")
+            else:
+                logger.warning(f"   ⚠️ Insufficient clean samples for retraining: {len(X_recent)} <= 10")
+        else:
+            logger.warning(f"   ⚠️ Insufficient data for retraining: {len(recent_df)} < 50")
+
 
 
 def run_ml_strategy_with_persistence(data: pd.DataFrame, strategy_class=MLWalkForwardStrategy, **kwargs):

@@ -23,6 +23,17 @@ build/*
 
 .venv/
 
+# User strategy outputs
+user_strategies/data/trades/*.csv
+user_strategies/data/performance/*.csv
+user_strategies/data/backtests/*.html
+user_strategies/outputs/*.html
+user_strategies/logs/*.log
+
+# Generated crypto data files
+binance_*.csv
+*.metadata.json
+
 # macOS
 .DS_Store
 .DS_Store?

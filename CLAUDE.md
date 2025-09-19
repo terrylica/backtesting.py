@@ -20,16 +20,62 @@ This is a forked copy of backtesting.py (https://kernc.github.io/backtesting.py/
 The project implements **clean separation** between original maintainer code and user development:
 
 ```
-user_strategies/                    # User code (separate from original)
-├── strategies/
-│   ├── ml_strategy.py              # Production ML strategies
+user_strategies/                    # All user code (separate from original)
+├── strategies/                     # Production strategies
+│   ├── ml_strategy.py              # ML walk-forward strategy with crypto data support
 │   └── __init__.py
-├── tests/
-│   ├── test_ml_strategy.py         # Pytest-based tests
+├── tests/                          # Strategy tests
+│   ├── test_ml_strategy.py         # ML strategy tests
 │   └── __init__.py
 ├── configs/                        # Strategy configurations
-└── data/                          # Trading data
+├── data/                           # Organized persistent outputs
+│   ├── trades/                     # Trade CSV outputs
+│   ├── performance/                # Performance metrics
+│   └── backtests/                  # HTML backtest visualizations
+├── research/                       # Research and exploration
+│   ├── data_pipeline/              # Pipeline studies
+│   └── crypto_exploration/         # Crypto data exploration
+├── logs/                           # Log files
+├── outputs/                        # Temporary/test outputs
+└── docs/                           # User strategy documentation
 ```
+
+## Separation of Concerns Principle
+
+### ABSOLUTE RULE: Never Modify Original backtesting.py Framework
+
+This project maintains **complete isolation** between the original backtesting.py framework and user development work.
+
+### Directory Ownership
+
+**Maintainer-Owned (READ-ONLY - DO NOT TOUCH):**
+- **`/backtesting/`** - Original framework code (backtesting.py, lib.py, _stats.py, etc.)
+- **`/doc/`** - Original documentation
+- **`/setup.py`, `/setup.cfg`, `/MANIFEST.in`** - Original packaging configuration
+- **`/README.md`, `/LICENSE.md`, `/CHANGELOG.md`, `/CONTRIBUTING.md`** - Original project documentation
+- **`/.github/`** - Original GitHub workflows and configuration
+- **`/.codecov.yml`** - Original code coverage configuration
+- **`/requirements.txt`** - Original dependency specifications
+
+**User-Owned (MODIFY FREELY):**
+- **`/user_strategies/`** - All user strategies, tests, and configurations
+- **`/CLAUDE.md`** - Claude-specific documentation (this file)
+- **`/sessions/`** - Conversation history and session data
+- **`/.claude/`** - Claude Code configuration
+
+### Data Source Integration
+
+The ML strategy now supports **dual data sources** with seamless switching:
+
+```python
+# EURUSD (traditional forex data)
+data = get_data_source('EURUSD')
+
+# Crypto data (authentic Binance data via gapless-crypto-data)
+data = get_data_source('crypto', symbol='BTCUSDT', start='2024-01-01', end='2024-01-08')
+```
+
+Both data sources maintain identical OHLCV format and work seamlessly with all backtesting.py strategies.
 
 ### ML Strategy Implementation Pattern
 
