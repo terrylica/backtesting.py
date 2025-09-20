@@ -1,0 +1,4 @@
+
+# .Sessions folder - never delete
+.sessions/
+!.sessions/.gitignore
