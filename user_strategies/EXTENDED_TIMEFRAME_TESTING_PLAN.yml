@@ -1,0 +1,327 @@
+openapi: 3.1.1
+info:
+  title: Extended Timeframe Testing Plan
+  version: 1.0.0
+  description: Machine-readable specification for extended temporal alignment validation
+paths:
+  /extended-timeframe-test:
+    post:
+      summary: Execute 5-year Bitcoin temporal alignment validation
+      operationId: executeExtendedTimeframeTest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtendedTestRequest'
+      responses:
+        '200':
+          description: Test execution successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtendedTestResponse'
+        '400':
+          description: Invalid configuration parameters
+        '500':
+          description: Test execution failure
+
+components:
+  schemas:
+    ExtendedTestRequest:
+      type: object
+      required:
+        - data_source
+        - ml_configuration
+        - strategy_configuration
+      properties:
+        data_source:
+          $ref: '#/components/schemas/DataSource'
+        ml_configuration:
+          $ref: '#/components/schemas/MLConfiguration'
+        strategy_configuration:
+          $ref: '#/components/schemas/StrategyConfiguration'
+
+    DataSource:
+      type: object
+      required:
+        - source_type
+        - symbol
+        - start_date
+        - end_date
+        - interval
+      properties:
+        source_type:
+          type: string
+          enum: ['crypto']
+          description: Data source type using gapless-crypto-data
+        symbol:
+          type: string
+          enum: ['BTCUSDT']
+          description: Trading pair symbol
+        start_date:
+          type: string
+          format: date
+          example: '2019-01-01'
+          description: Historical data start date
+        end_date:
+          type: string
+          format: date
+          example: '2024-12-31'
+          description: Historical data end date
+        interval:
+          type: string
+          enum: ['1d']
+          description: Data interval (daily)
+
+    MLConfiguration:
+      type: object
+      required:
+        - forecast_periods
+        - forecast_threshold
+        - n_train
+        - retrain_frequency
+      properties:
+        forecast_periods:
+          type: integer
+          enum: [7]
+          description: Temporal alignment horizon in days
+        forecast_threshold:
+          type: number
+          enum: [0.015]
+          description: Classification threshold (1.5% for 7-day moves)
+        n_train:
+          type: integer
+          enum: [200]
+          description: Training window size
+        retrain_frequency:
+          type: integer
+          enum: [20]
+          description: Retraining interval in bars
+
+    StrategyConfiguration:
+      type: object
+      required:
+        - price_delta
+        - cash
+        - commission
+        - exclusive_orders
+        - trade_on_close
+      properties:
+        price_delta:
+          type: number
+          enum: [0.07]
+          description: Stop-loss/take-profit aligned with forecast horizon (7%)
+        cash:
+          type: integer
+          enum: [10000000]
+          description: Initial capital ($10M)
+        commission:
+          type: number
+          enum: [0.0008]
+          description: Transaction cost (8bp)
+        exclusive_orders:
+          type: boolean
+          enum: [true]
+          description: Prevent position stacking
+        trade_on_close:
+          type: boolean
+          enum: [false]
+          description: Execute at next bar open
+
+    ExtendedTestResponse:
+      type: object
+      required:
+        - execution_status
+        - trade_statistics
+        - performance_metrics
+        - temporal_integrity
+        - file_outputs
+      properties:
+        execution_status:
+          type: string
+          enum: ['success', 'failure']
+        trade_statistics:
+          $ref: '#/components/schemas/TradeStatistics'
+        performance_metrics:
+          $ref: '#/components/schemas/PerformanceMetrics'
+        temporal_integrity:
+          $ref: '#/components/schemas/TemporalIntegrity'
+        file_outputs:
+          $ref: '#/components/schemas/FileOutputs'
+
+    TradeStatistics:
+      type: object
+      required:
+        - total_trades
+        - statistical_significance
+        - win_rate
+        - avg_trade_duration
+        - retraining_cycles
+      properties:
+        total_trades:
+          type: integer
+          minimum: 100
+          description: Target minimum for statistical significance
+        statistical_significance:
+          type: string
+          enum: ['achieved', 'insufficient']
+        win_rate:
+          type: number
+          minimum: 0
+          maximum: 100
+        avg_trade_duration:
+          type: number
+          description: Average trade duration in days
+        retraining_cycles:
+          type: integer
+          description: Number of walk-forward retraining events
+
+    PerformanceMetrics:
+      type: object
+      required:
+        - total_return
+        - sharpe_ratio
+        - max_drawdown
+        - alpha
+        - temporal_alignment_effectiveness
+      properties:
+        total_return:
+          type: number
+          description: Total strategy return percentage
+        sharpe_ratio:
+          type: number
+          description: Risk-adjusted return measure
+        max_drawdown:
+          type: number
+          description: Maximum peak-to-trough decline
+        alpha:
+          type: number
+          description: Excess return vs buy-and-hold benchmark
+        temporal_alignment_effectiveness:
+          type: string
+          enum: ['validated', 'degraded', 'failed']
+
+    TemporalIntegrity:
+      type: object
+      required:
+        - lookahea_bias_check
+        - feature_engineering_validation
+        - walk_forward_compliance
+      properties:
+        lookahea_bias_check:
+          type: string
+          enum: ['pass', 'fail']
+        feature_engineering_validation:
+          type: string
+          enum: ['pass', 'fail']
+        walk_forward_compliance:
+          type: string
+          enum: ['pass', 'fail']
+
+    FileOutputs:
+      type: object
+      required:
+        - trades_csv
+        - performance_csv
+        - backtest_html
+      properties:
+        trades_csv:
+          type: string
+          description: Trade-level data file path
+        performance_csv:
+          type: string
+          description: Performance metrics file path
+        backtest_html:
+          type: string
+          description: Interactive visualization file path
+
+  parameters:
+    TestConfiguration:
+      name: test_config
+      in: query
+      description: Temporal alignment test configuration
+      required: true
+      schema:
+        type: object
+        properties:
+          forecast_horizon:
+            type: integer
+            enum: [7]
+          stop_loss_alignment:
+            type: number
+            enum: [0.07]
+          data_timeframe:
+            type: string
+            enum: ['5_years']
+
+x-implementation-requirements:
+  exception_handling:
+    policy: "exception-only-failure"
+    description: "No fallbacks, no failsafes - fail immediately with structured exceptions"
+  algorithm_usage:
+    policy: "out-of-box-only"
+    description: "Use sklearn.neighbors.KNeighborsClassifier, no custom algorithms"
+  backtesting_compliance:
+    framework: "backtesting.py"
+    patterns: ["pre-computed-features", "dataframe-based", "walk-forward-optimization"]
+  data_authenticity:
+    source: "gapless-crypto-data"
+    provider: "binance-public-data-repository"
+    validation: "required"
+
+x-project-memory-references:
+  current_implementation: "/user_strategies/strategies/ml_strategy.py"
+  temporal_alignment_guide: "/user_strategies/TEMPORAL_ALIGNMENT_GUIDE.md"
+  performance_analysis: "/user_strategies/IN_SAMPLE_OUT_SAMPLE_ANALYSIS.md"
+  data_output_directory: "/user_strategies/data/"
+
+x-version-tracking:
+  specification_version: "1.0.0"
+  implementation_status: "completed"
+  last_validated_configuration:
+    forecast_periods: 7
+    forecast_threshold: 0.015
+    price_delta: 0.07
+    test_period: "399_days"
+    result: "+20.18%_return"
+  current_validation_results:
+    test_period: "6_years_2019_2024"
+    total_trades: 664
+    statistical_significance: "achieved"
+    temporal_alignment_status: "degraded"
+    result: "-4.96%_return"
+    alpha: "-973.91%"
+    sharpe_ratio: -0.09
+
+x-execution-results:
+  timestamp: "2025-09-19T17:43:54.485596"
+  status: "success"
+  total_trades: 664
+  statistical_significance: "achieved"
+  total_return_pct: -4.96
+  sharpe_ratio: -0.09
+  max_drawdown_pct: -27.66
+  win_rate_pct: 48.8
+  alpha_pct: -973.91
+  temporal_alignment_status: "degraded"
+  data_period: "2019-2024"
+  years_covered: 6
+  files_generated:
+    - "MLWalkForwardStrategy_Extended5year_7day_20250919_174354_performance.csv"
+    - "MLWalkForwardStrategy_Extended5year_7day_20250919_174354_trades.csv"
+    - "MLWalkForwardStrategy_Extended5year_7day_20250919_174354_backtest.html"
+
+x-key-findings:
+  statistical_significance_achieved: true
+  trades_sufficient_for_analysis: true
+  temporal_alignment_performance: "degraded_on_extended_period"
+  market_regime_coverage: "comprehensive_6_year_period"
+  data_authenticity_confirmed: "binance_public_repository"
+  walk_forward_retraining_cycles: "approximately_94_cycles"
+
+x-analysis-implications:
+  short_term_vs_long_term_performance: "temporal_alignment_effective_short_term_only"
+  market_regime_sensitivity: "strategy_performance_degrades_across_market_cycles"
+  statistical_confidence: "high_confidence_with_664_trades"
+  next_research_direction: "investigate_regime_specific_configurations"

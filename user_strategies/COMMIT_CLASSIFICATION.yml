@@ -1,0 +1,103 @@
+openapi: 3.1.1
+info:
+  title: Commit Classification Specification
+  version: 2.1.0
+  description: Impact-graded version bump determination for extended timeframe testing implementation
+
+components:
+  schemas:
+    CommitAnalysis:
+      type: object
+      required:
+        - classification
+        - impact_score
+        - version_bump
+        - change_summary
+      properties:
+        classification:
+          type: string
+          enum: ["major", "minor", "patch"]
+          description: SemVer classification based on diff analysis
+        impact_score:
+          type: number
+          minimum: 0
+          maximum: 10
+          description: Weighted impact score from diff analysis
+        version_bump:
+          type: string
+          pattern: "^\\d+\\.\\d+\\.\\d+$"
+          description: Determined SemVer version increment
+        change_summary:
+          type: object
+          properties:
+            files_modified:
+              type: integer
+            lines_added:
+              type: integer
+            lines_removed:
+              type: integer
+            new_features:
+              type: array
+              items:
+                type: string
+            breaking_changes:
+              type: array
+              items:
+                type: string
+
+x-commit-analysis:
+  diff_stats:
+    files_modified: 4
+    lines_added: 535
+    lines_removed: 88
+    net_change: 447
+  file_impacts:
+    - file: "CLAUDE.md"
+      lines_changed: 33
+      impact: "documentation_update"
+      classification: "patch"
+    - file: "pyproject.toml"
+      lines_changed: 1
+      impact: "dependency_update"
+      classification: "patch"
+    - file: "user_strategies/strategies/ml_strategy.py"
+      lines_changed: 574
+      impact: "feature_implementation"
+      classification: "minor"
+    - file: "uv.lock"
+      lines_changed: 15
+      impact: "dependency_lock_update"
+      classification: "patch"
+  new_artifacts:
+    - "EXTENDED_TIMEFRAME_TESTING_PLAN.yml"
+    - "EXTENDED_TIMEFRAME_ANALYSIS.md"
+    - "IN_SAMPLE_OUT_SAMPLE_ANALYSIS.md"
+    - "TEMPORAL_ALIGNMENT_GUIDE.md"
+    - "benchmark_framework.py"
+    - "benchmark_strategies.py"
+    - "performance_csv_files: 8_files_<150KB_total"
+
+x-classification-determination:
+  primary_classification: "minor"
+  rationale: "extended_timeframe_testing_implementation_with_statistical_significance"
+  impact_factors:
+    - "new_research_capabilities: +3_impact"
+    - "comprehensive_analysis_framework: +2_impact"
+    - "machine_readable_specifications: +1_impact"
+    - "backward_compatibility_maintained: +0_impact"
+    - "no_breaking_api_changes: +0_impact"
+  total_impact_score: 6.0
+  version_bump_required: "minor"
+
+x-version-tracking:
+  current_version: "2.0.0"
+  proposed_version: "2.1.0"
+  bump_type: "minor"
+  commit_type: "feat"
+  scope: "extended-timeframe-testing"
+
+x-git-lfs-assessment:
+  largest_file_size: "108KB"
+  lfs_threshold: "100MB"
+  lfs_required: false
+  rationale: "all_files_under_threshold"
