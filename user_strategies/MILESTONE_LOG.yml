@@ -1,0 +1,105 @@
+openapi: 3.1.1
+info:
+  title: Milestone Commit Log
+  version: 2.1.0
+  description: AI/LLM-readable milestone documentation for version freeze points
+
+components:
+  schemas:
+    MilestoneEntry:
+      type: object
+      required:
+        - commit_id
+        - version
+        - timestamp
+        - classification
+        - achievements
+        - lessons_learned
+      properties:
+        commit_id:
+          type: string
+          pattern: "^[a-f0-9]{40}$"
+          description: Full SHA-1 commit identifier
+        version:
+          type: string
+          pattern: "^\\d+\\.\\d+\\.\\d+$"
+        timestamp:
+          type: string
+          format: date-time
+        classification:
+          type: string
+          enum: ["major", "minor", "patch"]
+        achievements:
+          type: array
+          items:
+            type: string
+        lessons_learned:
+          type: array
+          items:
+            type: string
+
+x-milestones:
+  - commit_id: "680275974fd9d12d89e1303a05c0c8bba5071722"
+    version: "2.1.0"
+    timestamp: "2025-09-23T19:03:32Z"
+    classification: "minor"
+    milestone_name: "extended_timeframe_statistical_significance"
+    scope: "ml_strategy_temporal_alignment_validation"
+
+    achievements:
+      - "statistical_significance_achieved_664_trades_6_years"
+      - "temporal_alignment_principle_validated_short_term"
+      - "market_regime_sensitivity_identified_and_quantified"
+      - "authentic_binance_data_integration_confirmed"
+      - "walk_forward_optimization_94_retraining_cycles"
+      - "comprehensive_analysis_framework_implemented"
+      - "machine_readable_specifications_created"
+      - "benchmark_framework_foundation_established"
+      - "session_protection_system_operational"
+      - "project_memory_synchronized_with_current_state"
+
+    technical_validation:
+      data_authenticity: "binance_public_repository_gapless_crypto_data_v2.9.0"
+      temporal_integrity: "no_look_ahead_bias_confirmed"
+      statistical_confidence: "664_trades_vs_100_minimum_target"
+      market_coverage: "2019_2024_all_major_cycles_bull_bear_crash_recovery"
+      performance_comparison: "7day_config_plus20.18_pct_399days_minus4.96_pct_6years"
+
+    lessons_learned:
+      - "temporal_alignment_effective_stable_periods_only"
+      - "market_regime_transitions_break_fixed_parameters"
+      - "high_ml_accuracy_insufficient_without_proper_temporal_matching"
+      - "volatility_regimes_require_adaptive_forecast_horizons"
+      - "walk_forward_retraining_frequency_adequate_but_parameters_static"
+      - "statistical_significance_requires_multiple_market_cycles"
+      - "authentic_data_essential_for_realistic_performance_assessment"
+
+    implementation_compliance:
+      exception_only_failure: "confirmed_no_fallbacks_implemented"
+      out_of_box_algorithms: "sklearn_kneighborsclassifier_exclusively"
+      idiomatic_backtesting_py: "pre_computed_features_dataframe_based"
+      version_tracking: "openapi_3.1.1_machine_readable_specifications"
+
+    next_research_priorities:
+      immediate: "14_day_14_percent_configuration_testing"
+      medium_term: "volatility_adaptive_parameter_implementation"
+      long_term: "regime_detection_automatic_parameter_switching"
+
+    critical_insights:
+      primary_finding: "temporal_alignment_principle_validated_but_requires_regime_adaptation"
+      performance_degradation_cause: "fixed_parameters_across_market_cycle_transitions"
+      statistical_confidence_achieved: "6.6x_minimum_target_trades"
+      implementation_readiness: "architecture_sound_parameters_need_adaptation"
+
+    file_artifacts_generated:
+      analysis_documents: 4
+      performance_csv_files: 8
+      machine_readable_specs: 2
+      framework_implementations: 2
+      total_artifacts: 16
+
+    version_freeze_point:
+      commit_sha: "680275974fd9d12d89e1303a05c0c8bba5071722"
+      branch: "crypto-data-integration"
+      status: "stable_milestone_ready_for_next_iteration"
+      deployment_readiness: "research_validated_production_requires_adaptation"
