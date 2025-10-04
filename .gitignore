@@ -42,3 +42,7 @@ binance_*.csv
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# .sessions folder - never delete
+.sessions/
+!.sessions/.gitignore
