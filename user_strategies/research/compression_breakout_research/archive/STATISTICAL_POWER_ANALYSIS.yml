@@ -1,0 +1,220 @@
+openapi: 3.1.1
+info:
+  title: Statistical Power Analysis for ML Trading Strategy
+  version: 1.0.0
+  description: Systematic determination of required sample size for meaningful statistical conclusions
+
+components:
+  schemas:
+    PowerAnalysisRequest:
+      type: object
+      required:
+        - expected_effect_size
+        - confidence_level
+        - statistical_power
+        - baseline_variance
+      properties:
+        expected_effect_size:
+          type: number
+          description: Expected alpha (excess return) in percentage points
+          example: 1.0
+        confidence_level:
+          type: number
+          minimum: 0.80
+          maximum: 0.99
+          description: Desired confidence level (typically 0.95)
+          example: 0.95
+        statistical_power:
+          type: number
+          minimum: 0.70
+          maximum: 0.99
+          description: Desired statistical power (typically 0.80)
+          example: 0.80
+        baseline_variance:
+          type: number
+          description: Expected variance of returns based on historical data
+          example: 108.0
+
+    PowerAnalysisResult:
+      type: object
+      required:
+        - required_sample_size
+        - current_sample_size
+        - sample_adequacy
+        - confidence_interval
+        - effect_detectability
+      properties:
+        required_sample_size:
+          type: integer
+          description: Minimum number of trades required for statistical significance
+        current_sample_size:
+          type: integer
+          description: Actual number of trades in current test
+        sample_adequacy:
+          type: string
+          enum: ['adequate', 'insufficient', 'marginal']
+        confidence_interval:
+          type: object
+          properties:
+            lower_bound:
+              type: number
+            upper_bound:
+              type: number
+            margin_of_error:
+              type: number
+        effect_detectability:
+          type: object
+          properties:
+            minimum_detectable_effect:
+              type: number
+              description: Minimum alpha detectable with current sample size
+            actual_effect_observed:
+              type: number
+              description: Actual alpha observed in testing
+
+x-current-strategy-analysis:
+  ml_walk_forward_strategy:
+    observed_performance:
+      total_trades: 664
+      alpha_observed: 0.25  # Corrected from -973.91%
+      strategy_return: -4.96
+      benchmark_return: -5.21  # Implied: -4.96 - 0.25 = -5.21
+      variance_estimate: 108.0  # Based on 10.39% annualized volatility
+
+    power_analysis_calculation:
+      # Using standard statistical power formula
+      # n = (Z_alpha/2 + Z_beta)^2 * (2 * variance) / effect_size^2
+      # Where:
+      # Z_alpha/2 = 1.96 (for 95% confidence)
+      # Z_beta = 0.84 (for 80% power)
+      # effect_size = expected alpha = 1.0%
+      # variance = 108.0
+
+      confidence_level: 0.95
+      statistical_power: 0.80
+      expected_effect_size: 1.0  # 1% alpha target
+      z_alpha_half: 1.96
+      z_beta: 0.84
+      variance: 108.0
+
+      required_sample_size_calculation: |
+        n = (1.96 + 0.84)^2 * (2 * 108.0) / (1.0)^2
+        n = (2.8)^2 * 216 / 1
+        n = 7.84 * 216
+        n = 1,693 trades
+
+      actual_calculation:
+        numerator: 1693.44  # (2.8^2) * 216
+        denominator: 1.0    # (1.0^2)
+        required_trades: 1694
+
+    current_assessment:
+      trades_available: 664
+      trades_required: 1694
+      sample_adequacy: "insufficient"
+      adequacy_ratio: 0.392  # 664/1694 = 39.2%
+
+    detectability_analysis:
+      # What effect size CAN we detect with 664 trades?
+      # Rearranging: effect_size = sqrt((Z_alpha/2 + Z_beta)^2 * (2 * variance) / n)
+      minimum_detectable_effect_calculation: |
+        effect_size = sqrt((1.96 + 0.84)^2 * (2 * 108.0) / 664)
+        effect_size = sqrt(7.84 * 216 / 664)
+        effect_size = sqrt(2.55)
+        effect_size = 1.60%
+
+      minimum_detectable_alpha: 1.60
+      observed_alpha: 0.25
+      detection_conclusion: "observed_effect_below_detection_threshold"
+
+    confidence_interval_current:
+      # CI = alpha ± (Z_alpha/2 * sqrt(variance/n))
+      margin_of_error_calculation: |
+        margin = 1.96 * sqrt(108.0 / 664)
+        margin = 1.96 * sqrt(0.1627)
+        margin = 1.96 * 0.4034
+        margin = 0.79%
+
+      margin_of_error: 0.79
+      lower_bound: -0.54  # 0.25 - 0.79
+      upper_bound: 1.04   # 0.25 + 0.79
+      interpretation: "confidence_interval_includes_zero_no_significance"
+
+x-corrective-action-plan:
+  immediate_actions:
+    - action: "Acknowledge insufficient sample size"
+      description: "664 trades insufficient for detecting 1% alpha with 80% power"
+      priority: "critical"
+
+    - action: "Increase data collection period"
+      description: "Extend testing to achieve 1,694+ trades (2.55x current sample)"
+      priority: "high"
+
+    - action: "Adjust effect size expectations"
+      description: "Focus on detecting effects ≥1.6% alpha with current sample"
+      priority: "medium"
+
+  sample_size_scenarios:
+    conservative_target:
+      target_alpha: 2.0  # More realistic for crypto volatility
+      required_trades: 423
+      current_adequacy: "adequate"  # 664 > 423
+
+    moderate_target:
+      target_alpha: 1.5
+      required_trades: 752
+      current_adequacy: "insufficient"  # 664 < 752
+
+    ambitious_target:
+      target_alpha: 1.0
+      required_trades: 1694
+      current_adequacy: "insufficient"  # 664 < 1694
+
+  data_extension_options:
+    extend_timeframe:
+      current_period: "2019-2024 (6 years)"
+      extended_period: "2017-2024 (8 years)"
+      estimated_additional_trades: 200+
+
+    reduce_retraining_frequency:
+      current_frequency: 20  # Retrain every 20 periods
+      reduced_frequency: 10  # Retrain every 10 periods
+      estimated_additional_trades: 300+
+
+    multiple_assets:
+      current_asset: "BTCUSDT only"
+      expanded_assets: "BTCUSDT, ETHUSDT, BNBUSDT"
+      estimated_trade_multiplication: 3x
+
+x-statistical-conclusions:
+  primary_finding: "Current sample size (664 trades) insufficient for detecting 1% alpha"
+  minimum_detectable_effect: "1.60% alpha with 80% power, 95% confidence"
+  observed_effect_significance: "0.25% alpha not statistically distinguishable from zero"
+  confidence_interval_result: "95% CI: [-0.54%, +1.04%] includes zero"
+
+  corrected_interpretation:
+    statistical_significance: "not_achieved"
+    effect_size_adequacy: "below_detection_threshold"
+    sample_size_adequacy: "insufficient_by_factor_of_2.55"
+
+  honest_assessment:
+    strategy_performance: "indistinguishable from random with current sample"
+    temporal_alignment_claim: "cannot be validated statistically"
+    regime_sensitivity_claim: "unsupported by statistical evidence"
+
+x-validation-requirements:
+  for_1_percent_alpha:
+    minimum_trades_required: 1694
+    current_shortfall: 1030
+    recommended_action: "extend_data_collection"
+
+  for_current_sample_664:
+    maximum_detectable_alpha: 1.60
+    observed_alpha: 0.25
+    statistical_conclusion: "no_significant_effect_detected"
+
+  for_statistical_significance:
+    null_hypothesis: "alpha = 0% (no excess return)"
+    alternative_hypothesis: "alpha > 0% (positive excess return)"
+    test_result: "fail_to_reject_null"
+    p_value_estimate: "> 0.05"

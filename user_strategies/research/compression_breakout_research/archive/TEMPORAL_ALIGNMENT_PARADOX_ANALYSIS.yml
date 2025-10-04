@@ -1,0 +1,281 @@
+openapi: 3.1.1
+info:
+  title: Temporal Alignment Paradox Investigation
+  version: 1.0.0
+  description: Root cause analysis of 7-day/7% configuration performance divergence
+
+components:
+  schemas:
+    TemporalParadoxAnalysis:
+      type: object
+      required:
+        - short_term_performance
+        - long_term_performance
+        - period_comparison
+        - regime_analysis
+        - root_cause_investigation
+      properties:
+        short_term_performance:
+          $ref: '#/components/schemas/ShortTermResults'
+        long_term_performance:
+          $ref: '#/components/schemas/LongTermResults'
+        period_comparison:
+          $ref: '#/components/schemas/PeriodComparison'
+        regime_analysis:
+          $ref: '#/components/schemas/MarketRegimeAnalysis'
+        root_cause_investigation:
+          $ref: '#/components/schemas/RootCauseInvestigation'
+
+    ShortTermResults:
+      type: object
+      properties:
+        period:
+          type: string
+          example: "399 days"
+        total_return:
+          type: number
+          example: 20.18
+        trade_count:
+          type: integer
+        win_rate:
+          type: number
+        market_conditions:
+          type: array
+          items:
+            type: string
+
+    LongTermResults:
+      type: object
+      properties:
+        period:
+          type: string
+          example: "6 years (2019-2024)"
+        total_return:
+          type: number
+          example: -4.96
+        trade_count:
+          type: integer
+          example: 664
+        win_rate:
+          type: number
+          example: 48.8
+
+    PeriodComparison:
+      type: object
+      properties:
+        performance_differential:
+          type: number
+          description: Difference in performance between periods
+        statistical_significance:
+          type: string
+          enum: ['significant', 'not_significant']
+        sample_size_factor:
+          type: number
+
+x-temporal-paradox-investigation:
+  performance_summary:
+    short_term_399_days:
+      return: "+20.18%"
+      period: "likely 2023-2024 bull market subset"
+      market_regime: "favorable_conditions"
+      statistical_power: "insufficient (estimated <200 trades)"
+
+    long_term_6_years:
+      return: "-4.96%"
+      period: "2019-2024 full cycle"
+      market_regime: "complete_bull_bear_cycles"
+      statistical_power: "insufficient (664 trades, need 1694)"
+
+    performance_differential: -25.14  # -4.96 - (+20.18)
+
+  hypotheses_investigation:
+    hypothesis_1_cherry_picking:
+      description: "Short-term period represents favorable market subset"
+      evidence_for:
+        - "399 days likely captures 2023-2024 crypto bull run"
+        - "Convenient stopping at profitable period"
+        - "No adverse market conditions included"
+      evidence_against:
+        - "Period selection may have been predetermined"
+      likelihood: "high"
+
+    hypothesis_2_regime_dependency:
+      description: "Strategy only works in specific market regimes"
+      evidence_for:
+        - "Positive in bull markets, negative overall"
+        - "Fixed parameters fail during regime transitions"
+        - "ML model optimized for trending conditions"
+      evidence_against:
+        - "Strategy should adapt via retraining"
+      likelihood: "high"
+
+    hypothesis_3_overfitting:
+      description: "Parameters optimized for specific historical period"
+      evidence_for:
+        - "7-day/7% parameters suspiciously specific"
+        - "Poor generalization to extended timeframes"
+        - "Walk-forward retraining insufficient"
+      evidence_against:
+        - "Parameters seem reasonable for Bitcoin volatility"
+      likelihood: "medium"
+
+    hypothesis_4_look_ahead_bias:
+      description: "Temporal integrity violations in short-term test"
+      evidence_for:
+        - "Dramatic performance difference suggests data snooping"
+        - "Perfect alignment between forecast and stop-loss suspicious"
+      evidence_against:
+        - "Long-term test shows temporal integrity maintained"
+      likelihood: "medium"
+
+    hypothesis_5_statistical_noise:
+      description: "Short-term outperformance due to random variation"
+      evidence_for:
+        - "Insufficient sample size in 399-day period"
+        - "High volatility in crypto markets"
+        - "Random walk can produce apparent patterns"
+      evidence_against:
+        - "20% outperformance seems too large for pure noise"
+      likelihood: "low"
+
+  market_regime_analysis:
+    crypto_market_cycles_2019_2024:
+      bear_market_2019:
+        period: "2019-Q1 to 2020-Q1"
+        bitcoin_performance: "significant decline then recovery"
+        strategy_challenge: "trend-following in volatile downtrend"
+
+      covid_crash_2020:
+        period: "2020-Q1"
+        bitcoin_performance: "-50% crash then recovery"
+        strategy_challenge: "black swan event, parameter breakdown"
+
+      bull_run_2020_2021:
+        period: "2020-Q2 to 2021-Q4"
+        bitcoin_performance: "massive bull run to $69K"
+        strategy_opportunity: "temporal alignment likely effective"
+
+      bear_market_2022:
+        period: "2022-Q1 to 2022-Q4"
+        bitcoin_performance: "decline from $69K to $15K"
+        strategy_challenge: "sustained downtrend with volatility"
+
+      recovery_2023:
+        period: "2023-Q1 to 2023-Q4"
+        bitcoin_performance: "recovery and new highs"
+        strategy_opportunity: "likely period for +20.18% performance"
+
+      consolidation_2024:
+        period: "2024-Q1 to 2024-Q4"
+        bitcoin_performance: "ranging between $40K-$100K"
+        strategy_challenge: "sideways market challenges trend strategies"
+
+  performance_breakdown_analysis:
+    likely_399_day_period:
+      start_date_estimate: "2023-01-01"
+      end_date_estimate: "2024-03-15"
+      market_conditions: "crypto recovery and bull market"
+      bitcoin_price_range: "$16K to $73K"
+      regime_type: "strong_uptrend_with_corrections"
+
+    excluded_periods_analysis:
+      covid_crash_march_2020:
+        impact: "likely -20% to -30% strategy performance"
+        reason: "black swan event breaks all parameters"
+
+      bear_market_2022:
+        impact: "likely -15% to -25% strategy performance"
+        reason: "sustained downtrend with high volatility"
+
+      early_2019_consolidation:
+        impact: "likely -5% to -10% strategy performance"
+        reason: "sideways action challenges momentum strategies"
+
+  root_cause_conclusions:
+    primary_cause: "market_regime_dependency"
+    description: "Strategy parameters optimized for trending markets, fail during regime transitions"
+
+    contributing_factors:
+      - factor: "parameter_rigidity"
+        description: "Fixed 7% stop-loss inappropriate across volatility regimes"
+        impact: "high"
+
+      - factor: "insufficient_adaptivity"
+        description: "20-period retraining too infrequent for regime changes"
+        impact: "high"
+
+      - factor: "cherry_picked_evaluation"
+        description: "399-day period captures only favorable conditions"
+        impact: "medium"
+
+      - factor: "feature_engineering_limitations"
+        description: "Features lack regime detection capabilities"
+        impact: "medium"
+
+    statistical_assessment:
+      short_term_significance: "not_statistically_valid"
+      long_term_significance: "not_statistically_valid"
+      overall_conclusion: "no_reliable_evidence_of_alpha_generation"
+
+x-corrective-recommendations:
+  immediate_actions:
+    - action: "Acknowledge regime dependency"
+      description: "Strategy only works in specific market conditions"
+      priority: "critical"
+
+    - action: "Implement regime detection"
+      description: "Add volatility regime and trend strength features"
+      implementation: "VIX-equivalent, trend strength indicators"
+
+    - action: "Adaptive parameter system"
+      description: "Dynamic stop-loss based on current volatility regime"
+      implementation: "ATR-based stop-loss, regime-specific thresholds"
+
+    - action: "Honest performance reporting"
+      description: "Report full-period results, not cherry-picked subsets"
+      implementation: "Always test complete available history"
+
+  strategic_improvements:
+    regime_adaptive_framework:
+      volatility_regimes:
+        - low_volatility: "stop_loss: 3-5%"
+        - medium_volatility: "stop_loss: 5-8%"
+        - high_volatility: "stop_loss: 8-12%"
+
+      trend_strength_adaptation:
+        - strong_trend: "increase position sizing"
+        - weak_trend: "reduce position sizing"
+        - no_trend: "disable trading"
+
+    enhanced_feature_engineering:
+      regime_detection_features:
+        - "rolling_volatility_percentile"
+        - "trend_strength_score"
+        - "market_regime_classifier"
+        - "correlation_stability_metric"
+
+  validation_requirements:
+    full_period_testing:
+      mandatory: "test complete available history"
+      no_cherry_picking: "no favorable subset selection"
+      regime_coverage: "ensure all market conditions included"
+
+    out_of_sample_validation:
+      holdout_period: "2024-Q4 to present"
+      walk_forward_validation: "proper temporal splits"
+      regime_stress_testing: "test across different volatility periods"
+
+x-honest-assessment:
+  temporal_alignment_verdict: "regime_dependent_not_universally_valid"
+  performance_sustainability: "not_demonstrated"
+  statistical_evidence: "insufficient_for_any_conclusions"
+
+  strategy_viability:
+    current_form: "not_viable_for_production"
+    required_improvements: "regime_adaptation_essential"
+    development_priority: "fundamental_redesign_needed"
+
+  research_implications:
+    temporal_alignment_principle: "conditionally_valid_requires_regime_awareness"
+    ml_walk_forward_approach: "promising_but_needs_adaptive_parameters"
+    crypto_market_applicability: "challenging_due_to_regime_volatility"

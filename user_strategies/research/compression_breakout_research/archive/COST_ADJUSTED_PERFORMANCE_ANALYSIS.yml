@@ -1,0 +1,226 @@
+openapi: 3.1.1
+info:
+  title: Cost-Adjusted Performance Analysis
+  version: 1.0.0
+  description: Transaction cost impact assessment on ML strategy performance
+
+components:
+  schemas:
+    CostAnalysisRequest:
+      type: object
+      required:
+        - total_trades
+        - total_commissions
+        - strategy_return
+        - benchmark_return
+      properties:
+        total_trades:
+          type: integer
+          description: Total number of trades executed
+        total_commissions:
+          type: number
+          description: Total commission costs in dollars
+        strategy_return:
+          type: number
+          description: Strategy return percentage including costs
+        benchmark_return:
+          type: number
+          description: Benchmark return percentage (cost-free)
+
+    CostImpactAnalysis:
+      type: object
+      required:
+        - cost_burden_assessment
+        - break_even_analysis
+        - efficiency_metrics
+        - trade_frequency_impact
+      properties:
+        cost_burden_assessment:
+          $ref: '#/components/schemas/CostBurdenAssessment'
+        break_even_analysis:
+          $ref: '#/components/schemas/BreakEvenAnalysis'
+        efficiency_metrics:
+          $ref: '#/components/schemas/EfficiencyMetrics'
+
+    CostBurdenAssessment:
+      type: object
+      properties:
+        total_cost_percentage:
+          type: number
+          description: Total costs as percentage of initial capital
+        cost_per_trade_average:
+          type: number
+          description: Average cost per trade
+        cost_drag_annualized:
+          type: number
+          description: Annualized cost drag on performance
+
+x-current-strategy-cost-analysis:
+  ml_walk_forward_strategy_6_year:
+    raw_performance_data:
+      initial_capital: 10000000  # $10M
+      final_equity: 9503617     # From CSV data
+      total_commissions: 2179892 # From CSV data
+      total_trades: 664
+      strategy_return: -4.96    # Including costs
+      period_days: 2085
+      period_years: 5.71
+
+    cost_burden_calculation:
+      total_commission_pct: 21.80  # $2,179,892 / $10,000,000 = 21.80%
+      commission_per_trade: 3283   # $2,179,892 / 664 = $3,283 per trade
+      commission_rate_per_trade: 0.0328  # $3,283 / $10,000,000 = 0.0328%
+
+      annualized_cost_drag_calculation: |
+        Annualized cost drag = (Total commissions / Initial capital) / Years
+        = ($2,179,892 / $10,000,000) / 5.71 years
+        = 21.80% / 5.71
+        = 3.82% per year
+
+      annualized_cost_drag: 3.82
+
+    gross_vs_net_performance:
+      net_return_observed: -4.96    # Actual strategy return (includes costs)
+      total_commission_cost: -21.80 # Commission drag
+      gross_return_calculation: |
+        Gross return = Net return + Commission costs
+        = -4.96% + 21.80%
+        = +16.84%
+
+      gross_return_estimate: 16.84
+      performance_attribution:
+        gross_alpha: 16.84         # Strategy performance before costs
+        commission_drag: -21.80    # Cost impact
+        net_result: -4.96          # Final performance
+
+    break_even_analysis:
+      current_trade_frequency:
+        trades_per_year: 116       # 664 trades / 5.71 years
+        trades_per_month: 9.7      # 116 / 12
+        avg_trade_duration: 3      # From CSV data
+
+      cost_efficiency_thresholds:
+        break_even_gross_return: 21.80  # Need +21.80% gross to break even
+        current_gross_return: 16.84     # Actual gross performance
+        efficiency_shortfall: -4.96    # 16.84 - 21.80 = -4.96%
+
+      trade_frequency_optimization:
+        current_commission_per_trade: 0.0328  # 3.28bp per trade
+        optimal_trade_frequency_calculation: |
+          For break-even with current gross performance:
+          Required gross return per trade = Commission cost per trade
+          16.84% gross over 664 trades = 0.0254% per trade
+          Commission cost = 0.0328% per trade
+          Efficiency ratio = 0.0254 / 0.0328 = 0.774
+
+        efficiency_ratio: 0.774  # Strategy generates 77.4% of required return
+        required_improvement: 0.291  # Need 29.1% better performance or lower costs
+
+x-cost-optimization-scenarios:
+  scenario_1_reduce_trade_frequency:
+    description: "Reduce trading frequency to improve cost efficiency"
+    current_frequency: 116      # trades per year
+    optimized_frequency: 50     # trades per year (-57% reduction)
+    cost_reduction: 0.574       # Proportional cost reduction
+    new_commission_drag: 9.36   # 21.80% * (50/116) = 9.36%
+    break_even_gross_required: 9.36
+    feasibility: "achievable if gross return maintained"
+
+  scenario_2_improve_commission_rate:
+    description: "Negotiate better commission rates"
+    current_rate: 0.0008       # 8 basis points
+    target_rate: 0.0004        # 4 basis points (-50% reduction)
+    cost_reduction: 0.50
+    new_commission_drag: 10.90  # 21.80% * 0.50 = 10.90%
+    break_even_gross_required: 10.90
+    feasibility: "possible with volume discounts"
+
+  scenario_3_improve_gross_performance:
+    description: "Enhance strategy to generate higher gross returns"
+    current_gross_return: 16.84
+    target_gross_return: 25.00  # +48% improvement needed
+    efficiency_margin: 3.20     # 25.00% - 21.80% = 3.20% net profit
+    feasibility: "challenging requires fundamental improvements"
+
+  scenario_4_combined_optimization:
+    description: "Reduce frequency + improve rates + enhance performance"
+    trade_frequency_reduction: 0.30  # -30% trades
+    commission_rate_improvement: 0.25  # -25% rates
+    gross_return_improvement: 0.20   # +20% gross return
+    combined_cost_drag: 11.47       # 21.80% * 0.70 * 0.75 = 11.47%
+    enhanced_gross_return: 20.21    # 16.84% * 1.20 = 20.21%
+    projected_net_return: 8.74      # 20.21% - 11.47% = 8.74%
+    feasibility: "realistic with systematic improvements"
+
+x-transaction-cost-insights:
+  primary_finding: "Transaction costs are the dominant factor destroying performance"
+  cost_impact_magnitude: "21.80% total cost drag exceeds any realistic alpha generation"
+  strategy_viability_assessment: "Not viable with current trade frequency and commission structure"
+
+  critical_cost_metrics:
+    cost_to_capital_ratio: 21.80     # Total costs as % of capital
+    cost_per_trade_percentage: 0.0328 # Average cost per trade
+    trades_per_year: 116             # Current frequency
+    cost_efficiency_ratio: 0.774     # Return vs cost efficiency
+
+  break_even_requirements:
+    minimum_gross_alpha_annual: 3.82   # To offset cost drag
+    minimum_gross_alpha_total: 21.80   # To offset total costs
+    current_gross_alpha_estimate: 16.84 # Estimated gross performance
+    alpha_deficit: -4.96              # Shortfall for break-even
+
+x-strategic-recommendations:
+  immediate_priority_ranking:
+    1_reduce_overtrade:
+      action: "Dramatically reduce trade frequency"
+      target: "50% fewer trades minimum"
+      impact: "Direct 50% cost reduction"
+      implementation: "Stricter entry criteria, longer holding periods"
+
+    2_commission_optimization:
+      action: "Negotiate institutional commission rates"
+      target: "4bp or lower (50% reduction)"
+      impact: "50% cost reduction on remaining trades"
+      implementation: "Volume-based pricing, institutional brokerage"
+
+    3_strategy_enhancement:
+      action: "Improve gross return generation"
+      target: "25%+ gross returns"
+      impact: "Overcome cost burden with superior performance"
+      implementation: "Better features, regime adaptation, portfolio approach"
+
+  cost_structure_redesign:
+    current_problematic_structure:
+      - "High frequency trading (116 trades/year)"
+      - "Retail commission rates (8bp)"
+      - "Small position changes (high cost per dollar traded)"
+
+    optimal_structure:
+      - "Lower frequency trading (50-60 trades/year)"
+      - "Institutional rates (3-4bp)"
+      - "Larger position changes (better cost efficiency)"
+
+  viability_gates:
+    minimum_viability_threshold:
+      gross_return_required: ">22% total"
+      OR_cost_reduction_required: ">50%"
+      OR_combined_improvement: "modest improvements in both"
+
+    current_status: "below_viability_threshold"
+    required_action: "fundamental_redesign_before_production"
+
+x-honest-performance_assessment:
+  cost_adjusted_conclusion:
+    strategy_effectiveness: "Strategy generates positive gross returns (+16.84%)"
+    cost_efficiency: "Transaction costs destroy all gains and more (-21.80%)"
+    net_result: "Strategy loses money due to excessive trading costs"
+
+  corrected_narrative:
+    temporal_alignment_reality: "May work but costs make it unprofitable"
+    ml_approach_validity: "Shows promise before cost consideration"
+    production_readiness: "Not viable without major cost optimization"
+
+  development_priorities:
+    critical_path: "Cost optimization must precede any performance enhancement"
+    success_metric: "Net positive returns after realistic transaction costs"
+    validation_requirement: "Include transaction costs in all future analysis"
