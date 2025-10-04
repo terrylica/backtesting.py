@@ -1,0 +1,4 @@
+symbol,window_size,threshold,regime_enabled,n_trades,return_pct,improvement_vs_baseline
+BTC,0,0.0,False,499,-99.51,0.0
+ETH,0,0.0,False,372,-97.6,0.0
+SOL,0,0.0,False,410,-100.0,0.0
