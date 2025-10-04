@@ -1,0 +1,4 @@
+symbol,n_events,win_rate_pct,runs_test_z,runs_test_p,interpretation,mean_favorable_streak,mean_unfavorable_streak,max_favorable_streak,max_unfavorable_streak,streak_balance_ratio,random_baseline_max_unfav_95pct,exceeds_baseline
+BTC,14605,33.4679904142417,-71.20691141503897,0.0,CLUSTERED (too few runs),3.658682634730539,7.267763649962603,149,177,0.5034124403246609,28.0,YES
+ETH,8315,33.66205652435358,-51.90282521069117,0.0,CLUSTERED (too few runs),3.49875,6.8863920099875156,102,171,0.5080672135605511,26.0,YES
+SOL,11455,31.802706241815805,-60.290149340315175,0.0,CLUSTERED (too few runs),3.3576036866359447,7.193370165745856,90,169,0.46676364614524274,28.0,YES
