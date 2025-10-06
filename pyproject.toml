@@ -39,15 +39,18 @@ ignore-names = [
 
 [dependency-groups]
 dev = [
+    "backtesting>=0.6.5",
     "bokeh>=3.8.0",
     "coverage>=7.10.6",
     "flake8>=7.3.0",
     "gapless-crypto-data>=2.9.0",
     "ipywidgets>=8.1.7",
+    "lightgbm>=4.6.0",
     "loguru>=0.7.3",
     "matplotlib>=3.10.6",
     "mypy>=1.18.1",
     "numpy>=2.3.3",
+    "openfe>=0.0.12",
     "pandas>=2.3.2",
     "pytest>=8.4.2",
     "sambo>=1.25.2",

@@ -291,7 +291,7 @@ x-version-tracking:
     statistical_significance: "achieved"
     temporal_alignment_status: "degraded"
     result: "-4.96%_return"
-    alpha: "-973.91%"
+    alpha: "+0.25%"
     sharpe_ratio: -0.09
 
 x-execution-results:
@@ -303,7 +303,7 @@ x-execution-results:
   sharpe_ratio: -0.09
   max_drawdown_pct: -27.66
   win_rate_pct: 48.8
-  alpha_pct: -973.91
+  alpha_pct: 0.25
   temporal_alignment_status: "degraded"
   data_period: "2019-2024"
   years_covered: 6

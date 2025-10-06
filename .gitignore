@@ -46,3 +46,6 @@ Thumbs.db
 # .sessions folder - never delete
 .sessions/
 !.sessions/.gitignore
+
+# Temporary OpenFE data files
+openfe_tmp_data*.feather
