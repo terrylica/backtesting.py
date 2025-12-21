@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 date: 2025-12-20
 decision-maker: Terry Li
 consulted:
