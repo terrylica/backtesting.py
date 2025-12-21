@@ -111,9 +111,9 @@ def get_data_from_clickhouse(
     )
 
     # Fetch data with auto-ingestion for missing periods
-    # query_ohlcv downloads data if missing from ClickHouse
-    df = gcch.query_ohlcv(
-        symbol=symbol,
+    # download() fetches from ClickHouse, auto-ingests if missing
+    df = gcch.download(
+        symbol,
         timeframe=timeframe,
         start=start_str,
         end=end_str,
