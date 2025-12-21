@@ -1,0 +1,42 @@
+branches:
+  - master
+
+plugins:
+  - - "@semantic-release/commit-analyzer"
+    - preset: angular
+      releaseRules:
+        - { type: "feat", release: "minor" }
+        - { type: "fix", release: "patch" }
+        - { type: "perf", release: "patch" }
+        - { type: "docs", scope: "adr", release: "patch" }
+        - { type: "refactor", release: "patch" }
+
+  - - "@semantic-release/release-notes-generator"
+    - preset: angular
+
+  # Generate ADR/Design Spec links automatically
+  - - "@semantic-release/exec"
+    - generateNotesCmd: 'node "$HOME/.claude/plugins/cache/cc-skills/itp/5.15.0/skills/semantic-release/scripts/generate-adr-notes.mjs" ${lastRelease.gitTag}'
+
+  - - "@semantic-release/changelog"
+    - changelogFile: CHANGELOG.md
+      changelogTitle: "# Changelog\n\nAll notable changes to this project will be documented in this file."
+
+  - - "@semantic-release/exec"
+    - prepareCmd: |
+        # Update version in pyproject.toml
+        sed -i '' 's/^version = ".*"/version = "${nextRelease.version}"/' pyproject.toml 2>/dev/null || \
+        sed -i 's/^version = ".*"/version = "${nextRelease.version}"/' pyproject.toml
+        # Update version in backtesting/__init__.py
+        sed -i '' 's/__version__ = ".*"/__version__ = "${nextRelease.version}"/' backtesting/__init__.py 2>/dev/null || \
+        sed -i 's/__version__ = ".*"/__version__ = "${nextRelease.version}"/' backtesting/__init__.py
+
+  - - "@semantic-release/git"
+    - assets:
+        - package.json
+        - CHANGELOG.md
+        - pyproject.toml
+        - backtesting/__init__.py
+      message: "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+
+  - "@semantic-release/github"
