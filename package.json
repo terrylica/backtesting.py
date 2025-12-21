@@ -1,0 +1,21 @@
+{
+  "name": "backtesting.py",
+  "version": "0.6.5",
+  "private": true,
+  "description": "Backtesting.py fork with ML walk-forward strategies and crypto data integration",
+  "scripts": {
+    "release": "semantic-release --no-ci",
+    "release:dry": "semantic-release --no-ci --dry-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/terrylica/backtesting.py.git"
+  },
+  "devDependencies": {
+    "semantic-release": "^25.0.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.0",
+    "@semantic-release/exec": "^7.0.0"
+  }
+}

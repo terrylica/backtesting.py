@@ -1,5 +1,23 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.
+
+# [1.1.0](https://github.com/terrylica/backtesting.py/compare/v1.0.0...v1.1.0) (2025-12-21)
+
+
+### Bug Fixes
+
+* **adapter:** use gcch.download() instead of query_ohlcv() ([c4f1ee9](https://github.com/terrylica/backtesting.py/commit/c4f1ee92849caa94fab234a8b1ce49644dc9a175))
+
+
+### Features
+
+* **multi-timeframe:** implement second-granularity stop-loss strategy ([549232a](https://github.com/terrylica/backtesting.py/commit/549232a4d130ffea6f19fbb7fe75703b4513138f))
+* **trade-efficiency:** implement MAE/MFE trade efficiency analysis module ([b812ad3](https://github.com/terrylica/backtesting.py/commit/b812ad373d1105757337b235fbe37fc9af57c4b8))
+* **triple-barrier:** implement probabilistic classification system ([54e0923](https://github.com/terrylica/backtesting.py/commit/54e09233a556c07e626968f14627b197ca73f17a))
+
+# Changelog
+
 All notable changes to RangeBar will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
