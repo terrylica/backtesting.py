@@ -12,10 +12,12 @@
 After testing 10 phases (8 failed approaches, 2 breakthroughs), we achieved **profitability on ETH (+0.28%)** through regime-aware trading.
 
 **Discovery (Phase 9):** Volatility compression breakouts exhibit **extreme non-random clustering** (P < 0.0001). While aggregate favorable rates are poor (33%), entropy analysis revealed hidden market regimes:
+
 - **Favorable regimes:** Compression breakouts work (avg 3.5-bar streaks)
 - **Unfavorable regimes:** Breakouts fail via mean reversion (avg 7.2-bar streaks, up to 177 consecutive)
 
 **Implementation (Phase 10):** Rolling window regime filtering (skip when last 10 trades < 40% favorable) transforms:
+
 - **BTC:** -99.51% baseline → -4.69% filtered (+94.8pp improvement)
 - **ETH:** -97.60% baseline → **+0.28% filtered** (+97.9pp improvement) ✅ **PROFITABLE**
 
@@ -26,7 +28,9 @@ After testing 10 phases (8 failed approaches, 2 breakthroughs), we achieved **pr
 ## Research Phases
 
 ### Phase 1-4: ML Feature Engineering (Prior Work)
+
 **Status:** ❌ All failed (49-52% accuracy ≈ random)
+
 - 3-bar thrust patterns
 - Manual technical features
 - OpenFE automated features
@@ -37,16 +41,19 @@ After testing 10 phases (8 failed approaches, 2 breakthroughs), we achieved **pr
 ---
 
 ### Phase 5: Multi-Timeframe Analysis
+
 **Script:** `scripts/01_multi_timeframe_test.py`
 
 **Hypothesis:** Longer timeframes (15m/30m/1h/2h) reduce noise, reveal patterns.
 
 **Methodology:**
+
 - Resampled 5m BTC data to 15m, 30m, 1h, 2h
 - Ran same regime detection (manual features + LightGBM)
 - Compared test accuracy across timeframes
 
 **Results:**
+
 ```
 Timeframe    Test Accuracy
 5min (ref)      49.7%
@@ -61,17 +68,20 @@ Timeframe    Test Accuracy
 ---
 
 ### Phase 6: ML Walk-Forward Strategy (Archived YAMLs)
+
 **Archive:** `archive/phase_6_ml_walkforward.yml` + 4 analysis YAMLs
 
 **Methodology:** 6-year backtest with periodic model retraining.
 
 **Results:**
+
 - Return: -4.96%
 - Trades: 664
 - Alpha: +0.25% (after correction from -973%)
 - Transaction cost drag: -21.8% (destroyed all gains)
 
 **Key Analyses:**
+
 - `CORRECTED_ML_STRATEGY_ASSESSMENT.yml`: Fixed alpha calculation error
 - `COST_ADJUSTED_PERFORMANCE_ANALYSIS.yml`: Costs exceed returns
 - `STATISTICAL_POWER_ANALYSIS.yml`: Need 1,694 trades for significance (only had 664)
@@ -82,17 +92,20 @@ Timeframe    Test Accuracy
 ---
 
 ### Phase 7: Volatility Breakout Strategy
+
 **Script:** `scripts/02_volatility_breakout_strategy.py`
 
 **Hypothesis:** Multi-timeframe volatility compression → clean directional breakouts.
 
 **Methodology:**
+
 - Compression filter: 5m/15m/30m ATR all in bottom 10% (150-bar distribution)
 - Entry: Price exceeds 20-bar high (long) or low (short)
 - Exit: 2x ATR stop loss, 4x ATR take profit, 100-bar time limit
 - Position sizing: Equal 2% risk per trade
 
 **Results:**
+
 ```
 Period: Oct 2024 - Sep 2025 (100k bars)
 Return:              -95.35%
@@ -107,18 +120,21 @@ Sharpe Ratio:        -26.80
 ---
 
 ### Phase 8: MAE/MFE Compression Research
+
 **Script:** `scripts/03_mae_mfe_analysis.py`
 **Results:** `results/phase_8_mae_mfe_analysis/`
 
 **Hypothesis:** Instead of trading, measure breakout quality via MAE/MFE ratios.
 
 **Methodology:**
+
 - Detect compression: 5m/15m/30m ATR in bottom N% (test 5/10/15/20%)
 - Identify breakouts: Price exceeds 20-bar high/low
 - Measure quality: MAE/MFE ratio over 10/20/30/50/100-bar forward horizons
 - Success criterion: MFE/|MAE| ≥ 2.0 (favorable 2x larger than adverse)
 
 **Results:**
+
 ```
 Total Events: 34,375 (BTC/ETH/SOL)
 Favorable Rate: 33.0%
@@ -134,6 +150,7 @@ Median MFE/|MAE| Ratios: 0.82-0.96 (adverse excursion dominates)
 **Initial Conclusion (WRONG):** ❌ 33% << 50% random = compression breakouts don't work, abandon approach.
 
 **Files:**
+
 - `breakout_events_raw.csv`: All 34,375 events with MAE/MFE metrics
 - `breakout_summary_statistics.csv`: Aggregated by symbol/threshold/horizon
 - `ratio_distributions.png`: Histograms (heavy left-skew, most <1.0)
@@ -146,12 +163,14 @@ Median MFE/|MAE| Ratios: 0.82-0.96 (adverse excursion dominates)
 ---
 
 ### Phase 9: Streak Entropy Analysis ✅ **BREAKTHROUGH**
+
 **Script:** `scripts/04_streak_entropy_analysis.py`
 **Results:** `results/phase_9_streak_entropy_breakthrough/`
 
 **Hypothesis:** Analyze SEQUENTIAL structure of favorable/unfavorable outcomes. If streaks reveal low entropy (clustering), we've found hidden order in apparent chaos.
 
 **Methodology:**
+
 - Convert 34,375 events into chronological sequences per symbol
 - **Runs Test (Wald-Wolfowitz):** Statistical test for sequence randomness
 - **Streak extraction:** Identify all consecutive favorable/unfavorable runs
@@ -163,6 +182,7 @@ Median MFE/|MAE| Ratios: 0.82-0.96 (adverse excursion dominates)
 **Results:**
 
 #### Runs Test (Randomness Detection)
+
 ```
 Symbol  P-value    Z-stat    Interpretation
 BTC     0.0000    -71.21    CLUSTERED (too few runs)
@@ -174,6 +194,7 @@ Negative Z = Clustering (too few alternations)
 ```
 
 #### Extreme Streak Lengths
+
 ```
 Symbol  Observed Max  Random 95%  Ratio   Verdict
 BTC        177          28        6.3x    ✓ EXTREME
@@ -187,6 +208,7 @@ Shuffled comparison (same 33% win rate, randomized):
 ```
 
 #### Streak Distribution Statistics
+
 ```
 Symbol  Mean Fav  Mean Unfav  Balance Ratio
 BTC      3.66      7.27        0.50
@@ -197,6 +219,7 @@ SOL      3.36      7.19        0.47
 ```
 
 #### Cross-Symbol Regime Synchronization
+
 ```
 Total dates with multi-symbol regimes: 178 (out of 347 days analyzed)
 
@@ -210,6 +233,7 @@ Example: August 23, 2025
 ```
 
 #### Significant Regimes Detected
+
 ```
 Total regimes (≥5 consecutive unfavorable): 1,036 periods
 
@@ -222,12 +246,14 @@ Longest regimes:
 **Breakthrough Conclusion:** ✅ **STRUCTURE FOUND**
 
 The 33% favorable rate is NOT random - it exhibits extreme clustering (P < 0.0001):
+
 - **Favorable regimes:** Compression breakouts work
 - **Unfavorable regimes:** Compression breakouts fail (mean reversion)
 - **Regimes are detectable** via streak monitoring (≥5 consecutive outcomes)
 - **Regimes synchronize** across symbols (market-wide)
 
 **Implication:**
+
 ```
 Naive approach (trade all breakouts):
   Favorable rate: 33%
@@ -241,6 +267,7 @@ Regime-aware approach (skip unfavorable regimes):
 ```
 
 **Files:**
+
 - `streak_analysis_summary.csv`: Per-symbol runs test, streak stats
 - `configuration_entropy_rankings.csv`: All 120 configs ranked by structure (all show clustering)
 - `unfavorable_regimes.csv`: All 1,036 detected regime periods
@@ -251,22 +278,26 @@ Regime-aware approach (skip unfavorable regimes):
 ---
 
 ### Phase 10: Regime-Aware Trading Implementation ✅ **PROFITABLE**
+
 **Scripts:** `scripts/05-08_regime_*.py` (4 scripts)
 **Results:** `results/phase_10_regime_filtering/` (4 subdirectories)
 
 **Objective:** Transform Phase 9's regime discovery into actionable trading strategy.
 
 #### Phase 10A: Retrospective Simulation
+
 **Script:** `05_regime_validation_retrospective.py`
 **Results:** `phase_10a_retrospective/`
 
 **Methodology:**
+
 - Load 34,375 events from Phase 8 (with pre-calculated outcomes)
 - Simulate regime-aware filtering: Skip trades when unfavorable_streak ≥ 5
 - Use ONLY past outcomes to decide current trade (lookahead prevention)
 - Train/test split: Oct 2024-Apr 2025 (train) / May 2025-Sep 2025 (test)
 
 **Results:**
+
 ```
 TRAIN Period:
   Baseline: 35.60% favorable
@@ -284,15 +315,18 @@ TEST Period (Out-of-Sample):
 **Conclusion:** ✅ Regime filtering transforms 33% → 54-58% win rate with extreme statistical significance.
 
 #### Phase 10B: First Backtest (Sequential Streak)
+
 **Script:** `06_regime_aware_strategy_v1_sequential.py`
 **Results:** `phase_10b_sequential_backtest/`
 
 **Methodology:**
+
 - Implement regime-aware volatility breakout strategy
 - Sequential streak logic: Skip all entries when unfavorable_streak ≥ 5
 - Track MAE/MFE in real-time, update regime after trade close
 
 **Results:**
+
 ```
 BTC (100k bars, Oct 2024 - Sep 2025):
   Baseline:  -95.35% (260 trades)
@@ -303,10 +337,12 @@ BTC (100k bars, Oct 2024 - Sep 2025):
 **Critical Issue Discovered:** Logic trap - once unfavorable_streak ≥ 5, strategy gets stuck (no new trades = no new outcomes = streak never resets). Only 11 trades executed before permanent lock.
 
 #### Phase 10C: Rolling Window Fix
+
 **Script:** `07_regime_aware_strategy_v2_rolling_window.py`
 **Results:** `phase_10c_rolling_window/`
 
 **Solution:** Replace sequential streak with rolling window:
+
 ```python
 # Old (sequential - gets stuck):
 if unfavorable_streak >= 5:
@@ -318,6 +354,7 @@ if last_20_trades.favorable_rate < 0.40:
 ```
 
 **Results:**
+
 ```
 BTC (100k bars):
   Baseline:         -95.35% (260 trades)
@@ -330,10 +367,12 @@ V2 Improvement: +93.10pp (vs baseline)
 **Conclusion:** ✅ Rolling window fixes logic trap, achieves 93pp improvement, maintains continuous regime monitoring.
 
 #### Phase 10D: Comprehensive Parameter Sweep ✅ **BREAKTHROUGH**
+
 **Script:** `08_comprehensive_parameter_sweep.py`
 **Results:** `phase_10d_parameter_sweep/`
 
 **Methodology:**
+
 - Multi-symbol: BTC, ETH (SOL partial)
 - Extended data: 200k bars (~2 years per symbol)
 - Parameter grid: 5 windows (10/15/20/25/30) × 6 thresholds (30-55%) = 30 combinations
@@ -342,6 +381,7 @@ V2 Improvement: +93.10pp (vs baseline)
 **Results:**
 
 **BTC:**
+
 ```
 Baseline: -99.51% (499 trades)
 Best Config: window=10, threshold=55%
@@ -350,6 +390,7 @@ Best Config: window=10, threshold=55%
 ```
 
 **ETH:** 🔥 **FIRST PROFITABLE RESULT**
+
 ```
 Baseline: -97.60% (372 trades)
 Best Config: window=10, threshold=35-50% (all equivalent)
@@ -358,6 +399,7 @@ Best Config: window=10, threshold=35-50% (all equivalent)
 ```
 
 **Universal Configuration:**
+
 ```
 Window Size: 10 trades (recent outcomes most predictive)
 Threshold: 40% favorable rate
@@ -368,12 +410,14 @@ Expected:
 ```
 
 **Key Findings:**
+
 1. **ETH crosses into profitability** (+0.28% first positive result in all research)
 2. **Smaller windows perform better** (10 > 30 trades)
 3. **Extreme selectivity** (200k bars → only 10-30 trades taken)
 4. **Consistent improvement** (85-98pp across all parameters/symbols)
 
 **Files Generated:**
+
 - `COMPREHENSIVE_SWEEP_SUMMARY.md`: Full analysis report
 - `cross_symbol_rankings_partial.csv`: Best configs ranked
 - `partial_parameter_sweep_results.csv`: All 62 backtest results
@@ -383,6 +427,7 @@ Expected:
 **Phase 10 Summary:**
 
 **Complete Validation Chain:**
+
 - Phase 8: MAE/MFE analysis → 33% favorable (appeared random)
 - Phase 9: Entropy analysis → P < 0.0001 clustering (extreme structure)
 - Phase 10A: Retrospective → 54-58% filtered win rate (validated)
@@ -393,6 +438,7 @@ Expected:
 **From -97.6% catastrophic failure → +0.28% profitability = Complete transformation**
 
 ⚠️ **Caveats:**
+
 - Low sample size (10-30 trades per config)
 - Need extended testing (3+ years for statistical power)
 - BTC still negative (ETH-specific advantage?)
@@ -403,21 +449,26 @@ Expected:
 ## Key Insights
 
 ### 1. Aggregate Statistics Can Mask Sequential Structure
+
 Phase 8 showed 33% favorable rate → appeared random → wrong conclusion.
 Phase 9 revealed extreme clustering (P < 0.0001) → regime-dependent → actionable.
 
 **Lesson:** Always analyze SEQUENCES, not just aggregates.
 
 ### 2. Market Regimes Exist in Crypto
+
 Unfavorable regimes (mean reversion dominance) cluster for extended periods (up to 177 consecutive events). These are market-wide phenomena affecting BTC/ETH/SOL simultaneously.
 
 ### 3. Volatility Compression ≠ Directional Expansion
+
 Low volatility across 5m/15m/30m does NOT predict clean breakouts (68% fail). Instead, it often precedes **false breakouts** and immediate reversals.
 
 ### 4. Transaction Costs Matter
+
 Even marginal edges (52% vs 50%) get destroyed by 2bp commissions at high trade frequencies (Phase 6: -21.8% cost drag).
 
 ### 5. Regime Detection Enables Selective Trading
+
 By detecting unfavorable regimes (streak ≥5), can avoid 67% of losing trades, concentrating capital during favorable periods.
 
 ---
@@ -425,6 +476,7 @@ By detecting unfavorable regimes (streak ≥5), can avoid 67% of losing trades, 
 ## Reproducibility
 
 ### Prerequisites
+
 ```bash
 # Install dependencies
 uv add --dev lightgbm matplotlib scipy
@@ -439,6 +491,7 @@ user_strategies/data/raw/crypto_5m/
 ### Execution Order
 
 **Phase 5 (Multi-Timeframe):**
+
 ```bash
 cd user_strategies/research/compression_breakout_research
 uv run --active python scripts/01_multi_timeframe_test.py
@@ -448,6 +501,7 @@ uv run --active python scripts/01_multi_timeframe_test.py
 ```
 
 **Phase 7 (Volatility Breakout Strategy):**
+
 ```bash
 uv run --active python scripts/02_volatility_breakout_strategy.py
 
@@ -456,6 +510,7 @@ uv run --active python scripts/02_volatility_breakout_strategy.py
 ```
 
 **Phase 8 (MAE/MFE Analysis):**
+
 ```bash
 uv run --active python scripts/03_mae_mfe_analysis.py
 
@@ -468,6 +523,7 @@ uv run --active python scripts/03_mae_mfe_analysis.py
 ```
 
 **Phase 9 (Streak Entropy - BREAKTHROUGH):**
+
 ```bash
 uv run --active python scripts/04_streak_entropy_analysis.py
 
@@ -482,7 +538,8 @@ uv run --active python scripts/04_streak_entropy_analysis.py
 
 **Phase 10 (Regime-Aware Trading - PROFITABLE):**
 
-*Phase 10A - Retrospective Simulation:*
+_Phase 10A - Retrospective Simulation:_
+
 ```bash
 uv run --active python scripts/05_regime_validation_retrospective.py
 
@@ -491,7 +548,8 @@ uv run --active python scripts/05_regime_validation_retrospective.py
 # Result: 54-58% filtered win rate (vs 33% baseline), P < 0.000001
 ```
 
-*Phase 10B - First Backtest (Sequential):*
+_Phase 10B - First Backtest (Sequential):_
+
 ```bash
 uv run --active python scripts/06_regime_aware_strategy_v1_sequential.py
 
@@ -500,7 +558,8 @@ uv run --active python scripts/06_regime_aware_strategy_v1_sequential.py
 # Result: +77pp improvement but logic trap (stuck after 11 trades)
 ```
 
-*Phase 10C - Rolling Window Fix:*
+_Phase 10C - Rolling Window Fix:_
+
 ```bash
 uv run --active python scripts/07_regime_aware_strategy_v2_rolling_window.py
 
@@ -509,7 +568,8 @@ uv run --active python scripts/07_regime_aware_strategy_v2_rolling_window.py
 # Result: +93pp improvement, continuous monitoring (20 trades)
 ```
 
-*Phase 10D - Parameter Sweep:*
+_Phase 10D - Parameter Sweep:_
+
 ```bash
 uv run --active python scripts/08_comprehensive_parameter_sweep.py
 
@@ -519,6 +579,7 @@ uv run --active python scripts/08_comprehensive_parameter_sweep.py
 ```
 
 **Validation:**
+
 ```bash
 # Verify Phase 8 output matches original
 cd results/phase_8_mae_mfe_analysis
@@ -539,6 +600,7 @@ head -5 streak_analysis_summary.csv
 **Status:** Regime-aware trading validated and profitable on ETH (+0.28%)
 
 **Achieved:**
+
 - Phase 10A: Retrospective simulation (54-58% win rate, P < 0.000001)
 - Phase 10B: First backtest (+77pp improvement, logic trap discovered)
 - Phase 10C: Rolling window fix (+93pp improvement, continuous monitoring)
@@ -589,6 +651,7 @@ head -5 streak_analysis_summary.csv
 ### Production Implementation (Ready for ETH)
 
 **Validated Configuration:**
+
 ```python
 regime_window_size = 10  # Last 10 closed trades
 regime_favorable_threshold = 0.40  # 40% favorable rate minimum
@@ -601,6 +664,7 @@ else:
 ```
 
 **Expected Performance (ETH):**
+
 - Return: +0.28%
 - Improvement: +97.9pp vs baseline
 - Trade frequency: ~10 trades per 200k bars (highly selective)
@@ -666,29 +730,32 @@ compression_breakout_research/
 ## References
 
 ### Related Documentation
+
 - **Executive Summary:** `../../docs/volatility_regime_research.md`
 - **Session History:** `.sessions/2025-10-04_151114_regime-streak-analysis.txt`
 - **Project Guidelines:** `../../CLAUDE.md`
 
 ### Data Sources
+
 - **BTC/ETH/SOL 5m data:** `../../data/raw/crypto_5m/` (via `gapless-crypto-data`)
 - **Period:** Oct 2024 - Sep 2025 (100k bars per symbol)
 
 ### Key Metrics
-| Metric | Value |
-|--------|-------|
-| Total events analyzed | 34,375 |
-| Symbols | BTC, ETH, SOL |
-| Phases completed | 10 (Phases 1-4 archived, 5-10 documented) |
-| Failed approaches | 8 (Phases 1-7) |
-| Breakthrough phases | 9 (Regime Discovery), 10 (Implementation) |
-| Structure significance | P < 0.0001 (extreme clustering) |
-| Max unfavorable streak | 177 consecutive events |
-| Random baseline | 26-29 (95%ile) |
-| Excess ratio | 6-7x beyond random |
-| **Best result** | **ETH +0.28% (Phase 10D)** ✅ |
-| Baseline (without regime) | BTC: -99.51%, ETH: -97.60% |
-| Improvement (with regime) | BTC: +94.8pp, ETH: +97.9pp |
+
+| Metric                    | Value                                     |
+| ------------------------- | ----------------------------------------- |
+| Total events analyzed     | 34,375                                    |
+| Symbols                   | BTC, ETH, SOL                             |
+| Phases completed          | 10 (Phases 1-4 archived, 5-10 documented) |
+| Failed approaches         | 8 (Phases 1-7)                            |
+| Breakthrough phases       | 9 (Regime Discovery), 10 (Implementation) |
+| Structure significance    | P < 0.0001 (extreme clustering)           |
+| Max unfavorable streak    | 177 consecutive events                    |
+| Random baseline           | 26-29 (95%ile)                            |
+| Excess ratio              | 6-7x beyond random                        |
+| **Best result**           | **ETH +0.28% (Phase 10D)** ✅             |
+| Baseline (without regime) | BTC: -99.51%, ETH: -97.60%                |
+| Improvement (with regime) | BTC: +94.8pp, ETH: +97.9pp                |
 
 ---
 

@@ -1,7 +1,7 @@
 [![](https://i.imgur.com/E8Kj69Y.png)](https://kernc.github.io/backtesting.py/)
 
-Backtesting.py
-==============
+# Backtesting.py
+
 [![Build Status](https://img.shields.io/github/actions/workflow/status/kernc/backtesting.py/ci.yml?branch=master&style=for-the-badge)](https://github.com/kernc/backtesting.py/actions)
 [![Code Coverage](https://img.shields.io/codecov/c/gh/kernc/backtesting.py.svg?style=for-the-badge&label=Covr)](https://codecov.io/gh/kernc/backtesting.py)
 [![Source lines of code](https://img.shields.io/endpoint?url=https%3A%2F%2Fghloc.vercel.app%2Fapi%2Fkernc%2Fbacktesting.py%2Fbadge?filter=.py%26format=human&style=for-the-badge&label=SLOC&color=green)](https://ghloc.vercel.app/kernc/backtesting.py)
@@ -17,14 +17,12 @@ Backtest trading strategies with Python.
 [Documentation]: https://kernc.github.io/backtesting.py/doc/backtesting/
 [YouTube]: https://www.youtube.com/results?q=%22backtesting.py%22
 
-Installation
-------------
+## Installation
 
     $ pip install backtesting
 
+## Usage
 
-Usage
------
 ```python
 from backtesting import Backtest, Strategy
 from backtesting.lib import crossover
@@ -90,35 +88,33 @@ _equity_curve                          Equ...
 _trades                       Size  EntryB...
 dtype: object
 ```
+
 [![plot of trading simulation](https://i.imgur.com/xRFNHfg.png)](https://kernc.github.io/backtesting.py/#example)
 
 Find more usage examples in the [documentation].
 
+## Features
 
-Features
---------
-* Simple, well-documented API
-* Blazing fast execution
-* Built-in optimizer
-* Library of composable base strategies and utilities
-* Indicator-library-agnostic
-* Supports _any_ financial instrument with candlestick data
-* Detailed results
-* Interactive visualizations
+- Simple, well-documented API
+- Blazing fast execution
+- Built-in optimizer
+- Library of composable base strategies and utilities
+- Indicator-library-agnostic
+- Supports _any_ financial instrument with candlestick data
+- Detailed results
+- Interactive visualizations
 
 ![xkcd.com/1570](https://imgs.xkcd.com/comics/engineer_syllogism.png)
 
+## Bugs
 
-Bugs
-----
 Before reporting bugs or posting to the
 [discussion board](https://github.com/kernc/backtesting.py/discussions),
 please read [contributing guidelines](CONTRIBUTING.md), particularly the section
-about crafting useful bug reports and ```` ``` ````-fencing your code. We thank you!
+about crafting useful bug reports and ` ``` `-fencing your code. We thank you!
 
+## Alternatives
 
-Alternatives
-------------
 See [alternatives.md] for a list of alternative Python
 backtesting frameworks and related packages.
 

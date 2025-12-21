@@ -19,20 +19,24 @@ Test hypothesis: Volatility compression → breakout failures can be exploited v
 ## Service Level Objectives (SLOs)
 
 ### Availability
+
 - Script execution success rate: ≥99% (allow 1 failure per 100 runs)
 - Data loading success rate: 100% (hard requirement)
 
 ### Correctness
+
 - Trade execution accuracy: 100% (no phantom trades)
 - MFE/MAE calculation precision: ±0.01%
 - Temporal integrity: Zero lookahead bias tolerance
 
 ### Observability
+
 - Logging coverage: 100% of trade decisions
 - Diagnostic output: CSV + markdown reports
 - Trade-by-trade audit trail required
 
 ### Maintainability
+
 - Code reuse from Phase 10D strategy: ≥80%
 - Parameter externalization: All thresholds configurable
 - Documentation: Inline comments for all logic inversions
@@ -64,15 +68,18 @@ elif current_price < prev_low:
 ```
 
 **Exit logic modifications**:
+
 - Current: Stop at entry ± 2ATR, target at entry ± 4ATR
 - New: Invert - stop at breakout continuation, target at range midpoint
 
 **Dependencies**:
+
 - Reuse: `calculate_atr()`, `calculate_percentile_rank()` from Phase 10D
 - Reuse: Low volatility filter (multi-timeframe ATR < 10%)
 - Reuse: Breakout detection (20-period high/low)
 
 **Error Handling**:
+
 - Data validation: Assert OHLCV columns present, raise ValueError if missing
 - Indicator validation: Assert no NaN in ATR, raise RuntimeError if found
 - Trade validation: Assert position size > 0, raise AssertionError if zero
@@ -85,13 +92,14 @@ elif current_price < prev_low:
 
 **Test Matrix**:
 
-| Asset | Period | Baseline | Mean Reversion | Success Criteria |
-|-------|--------|----------|----------------|------------------|
-| ETH | 2022-2025 | -100% | Target: >-50% | Return improvement ≥50pp |
-| ETH | 2024-2025 | -97.6% | Target: >0% | Profitability |
-| ETH | 2022-2023 | -99.96% | Target: >-50% | Loss reduction |
+| Asset | Period    | Baseline | Mean Reversion | Success Criteria         |
+| ----- | --------- | -------- | -------------- | ------------------------ |
+| ETH   | 2022-2025 | -100%    | Target: >-50%  | Return improvement ≥50pp |
+| ETH   | 2024-2025 | -97.6%   | Target: >0%    | Profitability            |
+| ETH   | 2022-2023 | -99.96%  | Target: >-50%  | Loss reduction           |
 
 **Metrics Captured**:
+
 - Return [%]
 - # Trades
 - Win Rate [%] (target: ≥50%)
@@ -101,6 +109,7 @@ elif current_price < prev_low:
 - MFE/MAE ratio distribution
 
 **Kill Criteria** (hard stop):
+
 1. Win rate < 35% (worse than breakout following)
 2. Return < -75% (minimal improvement)
 3. Trades < 10 (regime lockout persists)
@@ -116,11 +125,13 @@ elif current_price < prev_low:
 **Test**: Run mean reversion on BTC, SOL (same config as Phase 12B)
 
 **Success Criteria**:
+
 - ≥2 assets show return > -50%
 - ≥1 asset shows return > 0%
 - Win rate consistently ≥50% across assets
 
 **Output**:
+
 - `results/phase_12_mean_reversion/cross_asset_validation.csv`
 - Comparative analysis vs Phase 11 baseline
 
@@ -131,6 +142,7 @@ elif current_price < prev_low:
 **Conditional**: Only execute if Phase 12C shows promise
 
 **Parameters to sweep**:
+
 - `stop_atr_multiple`: [1.0, 1.5, 2.0] (tighter than baseline)
 - `target_atr_multiple`: [2.0, 3.0, 4.0] (range midpoint targets)
 - `volatility_threshold`: [0.10, 0.15, 0.20] (current best known)
@@ -138,6 +150,7 @@ elif current_price < prev_low:
 **Grid**: 3 × 3 × 3 = 27 combinations per asset
 
 **Output**:
+
 - Heatmap: Win rate vs (stop, target)
 - Best configuration per asset
 - Universal configuration (works across assets)
@@ -167,6 +180,7 @@ user_strategies/research/compression_breakout_research/
 ## Code Reuse Policy
 
 **Reuse from Phase 10D** (`08_comprehensive_parameter_sweep.py`):
+
 - ✅ `calculate_atr()` function
 - ✅ `calculate_percentile_rank()` function
 - ✅ `load_5m_data()` function
@@ -174,11 +188,13 @@ user_strategies/research/compression_breakout_research/
 - ✅ Breakout detection (20-period high/low)
 
 **Modify**:
+
 - ❌ Entry direction (invert buy/sell)
 - ❌ Exit targets (range midpoint vs continuation)
 - ❌ Class name: `MeanReversionRegimeStrategy`
 
 **Do NOT reuse**:
+
 - ❌ Regime filtering (test baseline first)
 - ❌ Parameter values (re-optimize for mean reversion)
 
@@ -191,6 +207,7 @@ user_strategies/research/compression_breakout_research/
 **Check**: ETH single-asset results
 
 **GO Criteria**:
+
 - Return > -50%
 - Win rate ≥ 50%
 - Trades ≥ 50
@@ -202,6 +219,7 @@ user_strategies/research/compression_breakout_research/
 **Check**: Cross-asset results
 
 **GO Criteria**:
+
 - ≥1 asset profitable (return > 0%)
 - All assets show improvement vs baseline
 - Win rate ≥ 50% on ≥2 assets
@@ -213,6 +231,7 @@ user_strategies/research/compression_breakout_research/
 **Check**: Optimized configuration
 
 **GO Criteria**:
+
 - ≥1 asset shows return > 5% (annualized: >1.3%)
 - Win rate ≥ 60%
 - Sharpe ratio > 0.5
@@ -224,11 +243,13 @@ user_strategies/research/compression_breakout_research/
 ## Success Metrics
 
 ### Minimum Viable (Proceed to Phase 13)
+
 - Return: > 0% on ≥1 asset
 - Win rate: ≥ 50%
 - Improvement vs baseline: ≥50pp
 
 ### Production Ready (Skip to deployment)
+
 - Return: > 10% annualized (>37.5% over 3.75 years)
 - Win rate: ≥ 60%
 - Sharpe: > 1.0
@@ -241,6 +262,7 @@ user_strategies/research/compression_breakout_research/
 **No silent failures. No defaults. No retries.**
 
 ### Data Errors
+
 ```python
 # Example: Assert data integrity
 if df.isnull().sum().sum() > 0:
@@ -251,6 +273,7 @@ if len(df) < 200:
 ```
 
 ### Execution Errors
+
 ```python
 # Example: Validate trade execution
 if position_size <= 0:
@@ -261,6 +284,7 @@ if pd.isna(self.atr[-1]):
 ```
 
 ### Validation Errors
+
 ```python
 # Example: Check kill criteria
 if stats['Win Rate [%]'] < 35:
@@ -274,16 +298,19 @@ if stats['Win Rate [%]'] < 35:
 ## Dependencies
 
 ### Python Packages (from pyproject.toml)
+
 - `backtesting==0.6.5` (framework)
 - `pandas==2.3.2` (data manipulation)
 - `numpy==2.3.3` (calculations)
 
 ### Data Sources
+
 - `user_strategies/data/raw/crypto_5m/binance_spot_ETHUSDT-5m_20220101-20250930_v2.10.0.csv`
 - `user_strategies/data/raw/crypto_5m/binance_spot_BTCUSDT-5m_20220101-20250930_v2.10.0.csv`
 - `user_strategies/data/raw/crypto_5m/binance_spot_SOLUSDT-5m_20220101-20250930_v2.10.0.csv`
 
 ### Prior Research
+
 - Phase 8: MAE/MFE compression analysis
 - Phase 9: Streak entropy analysis
 - Phase 10: Regime-aware trading (baseline strategy)
@@ -297,13 +324,14 @@ if stats['Win Rate [%]'] < 35:
 
 **ETH Results (2022-2025, 394k bars)**:
 
-| Strategy | Return | Trades | Win Rate | Sharpe |
-|----------|--------|--------|----------|--------|
-| Breakout (Phase 10D) | -100.00% | 846 | 36.3% | -23.33 |
-| Mean Reversion (Phase 12A) | -99.36% | 1,221 | **28.7%** | -1.75 |
-| **Delta** | **+0.64pp** | **+375** | **-7.5pp** | **+21.58** |
+| Strategy                   | Return      | Trades   | Win Rate   | Sharpe     |
+| -------------------------- | ----------- | -------- | ---------- | ---------- |
+| Breakout (Phase 10D)       | -100.00%    | 846      | 36.3%      | -23.33     |
+| Mean Reversion (Phase 12A) | -99.36%     | 1,221    | **28.7%**  | -1.75      |
+| **Delta**                  | **+0.64pp** | **+375** | **-7.5pp** | **+21.58** |
 
 **Gate 1 Evaluation**:
+
 - Return > -50%: -99.36% ❌ FAIL
 - Win Rate ≥ 50%: 28.7% ❌ FAIL
 - Trades ≥ 50: 1,221 ✅ PASS
@@ -319,12 +347,14 @@ if stats['Win Rate [%]'] < 35:
 ## Version History
 
 ### v1.1.0 (2025-10-04)
+
 - Added execution results
 - Gate 1 failure documented
 - Hypothesis rejected: Mean reversion worse than breakout
 - Recommendation: Abandon compression approach
 
 ### v1.0.0 (2025-10-04)
+
 - Initial implementation plan
 - Based on Phase 11 diagnostics showing 70% breakout failure rate
 - SLOs defined
@@ -335,12 +365,15 @@ if stats['Win Rate [%]'] < 35:
 ## References
 
 **Supersedes**:
+
 - `/tmp/parameter_sensitivity/COMPREHENSIVE_REDESIGN_RECOMMENDATION.md` (archived to workspace)
 
 **Implements**:
+
 - Option B: Strategic Pivot - Mean Reversion from Compression
 
 **Next Phase** (after failure):
+
 - Phase 13: Ensemble Strategy (FAILED at Gate 1)
 - Phase 14: Proven Strategies Implementation (compression research ABANDONED)
 - File: `user_strategies/research/proven_strategies/PHASE_14_PROVEN_STRATEGIES_IMPLEMENTATION.md`

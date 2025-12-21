@@ -1,5 +1,5 @@
-Backtesting.py Documentation
-============================
+# Backtesting.py Documentation
+
 After installing documentation dependencies:
 
     pip install .[doc,test]

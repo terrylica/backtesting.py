@@ -9,6 +9,7 @@ This is a forked copy of backtesting.py (https://kernc.github.io/backtesting.py/
 ## Core Architecture
 
 ### Main Framework Components
+
 - **`backtesting/backtesting.py`**: Core `Backtest` and `Strategy` classes that form the framework foundation
 - **`backtesting/lib.py`**: Composable base strategies (`SignalStrategy`, `TrailingStrategy`) and utilities
 - **`backtesting/_stats.py`**: Statistical computations (Sharpe ratio, drawdown, etc.)
@@ -49,7 +50,8 @@ This project maintains **complete isolation** between the original backtesting.p
 ### Directory Ownership
 
 **Maintainer-Owned (READ-ONLY - DO NOT TOUCH):**
-- **`/backtesting/`** - Original framework code (backtesting.py, lib.py, _stats.py, etc.)
+
+- **`/backtesting/`** - Original framework code (backtesting.py, lib.py, \_stats.py, etc.)
 - **`/doc/`** - Original documentation
 - **`/setup.py`, `/setup.cfg`, `/MANIFEST.in`** - Original packaging configuration
 - **`/README.md`, `/LICENSE.md`, `/CHANGELOG.md`, `/CONTRIBUTING.md`** - Original project documentation
@@ -58,6 +60,7 @@ This project maintains **complete isolation** between the original backtesting.p
 - **`/requirements.txt`** - Original dependency specifications
 
 **User-Owned (MODIFY FREELY):**
+
 - **`/user_strategies/`** - All user strategies, tests, and configurations
 - **`/CLAUDE.md`** - Claude-specific documentation (this file)
 - **`/sessions/`** - Conversation history and session data
@@ -80,6 +83,7 @@ Both data sources maintain identical OHLCV format and work seamlessly with all b
 ### ML Strategy Implementation Pattern
 
 The **MLWalkForwardStrategy** is the most robust strategy implementation, featuring:
+
 - **Walk-forward optimization**: Retrains ML model every N periods (default: 20)
 - **Temporal integrity**: No look-ahead bias in feature engineering or model training
 - **Production-ready architecture**: k-NN classification with proper risk management
@@ -88,6 +92,7 @@ The **MLWalkForwardStrategy** is the most robust strategy implementation, featur
 ## Development Environment
 
 ### Dependency Management
+
 ```bash
 # Primary package manager - UV is used exclusively
 uv add <package>                    # Add runtime dependency
@@ -96,6 +101,7 @@ uv run --active python <script>    # Run with UV environment
 ```
 
 ### Essential Dependencies
+
 - **Core**: `numpy`, `pandas`, `scikit-learn`, `bokeh`
 - **Testing**: `pytest`, `coverage`
 - **Linting**: `ruff`, `flake8`, `mypy`
@@ -104,6 +110,7 @@ uv run --active python <script>    # Run with UV environment
 ## Common Development Commands
 
 ### Testing
+
 ```bash
 # Run original framework tests
 uv run --active python -m backtesting.test
@@ -121,6 +128,7 @@ uv run --active python -m coverage html
 ```
 
 ### Code Quality
+
 ```bash
 # Linting (configured in pyproject.toml)
 uv run --active python -m ruff check .
@@ -132,6 +140,7 @@ uv run --active python -m ruff format .
 ```
 
 ### ML Strategy Development
+
 ```bash
 # Current working test file with persistent output
 uv run --active python -c "
@@ -165,6 +174,7 @@ print(f'Return: {stats[\"Return [%]\"]:,.2f}%')
 ## Code Standards
 
 ### Backtesting.py Framework Standards
+
 - **Commission**: Use `0.0002` (2 basis points) for realistic trading costs
 - **Cash**: Use `10_000_000` as universal cash amount (works for all assets)
 - **Temporal Integrity**: ZERO TOLERANCE for look-ahead bias - never fit() on future data
@@ -172,6 +182,7 @@ print(f'Return: {stats[\"Return [%]\"]:,.2f}%')
 - **Benchmark Comparison**: All strategies MUST include benchmark comparison
 
 ### ML Strategy Requirements
+
 - **Data Minimums**: 600+ data points for reliable operation (200+ for training, 400+ for testing)
 - **Feature Engineering**: All features normalized by current price for scale invariance
 - **Retraining**: Walk-forward retraining every 10-20 periods for market adaptation
@@ -180,11 +191,13 @@ print(f'Return: {stats[\"Return [%]\"]:,.2f}%')
 ## Testing Philosophy
 
 ### Coverage Standards
+
 - **Current baseline**: 98% test coverage (2,497 statements, 56 missing)
 - **Target**: 100% line and branch coverage
-- **Missing areas**: Edge cases in backtesting.py (12 lines), _util.py (17 lines), others (27 lines)
+- **Missing areas**: Edge cases in backtesting.py (12 lines), \_util.py (17 lines), others (27 lines)
 
 ### Test Organization
+
 - **Original tests**: `backtesting/test/_test.py` (comprehensive framework testing)
 - **User tests**: `user_strategies/tests/` (pytest-based, focused on ML strategies)
 - **Separation principle**: User tests completely separate from original maintainer tests
@@ -192,6 +205,7 @@ print(f'Return: {stats[\"Return [%]\"]:,.2f}%')
 ## Key Implementation Notes
 
 ### ML Strategy Data Flow
+
 1. **Feature Engineering**: `create_features()` → Technical indicators + temporal features
 2. **Data Preparation**: `get_clean_Xy()` → Remove NaN values, ensure temporal alignment
 3. **Model Training**: Initial fit on first N samples, periodic retraining on rolling window
@@ -199,28 +213,35 @@ print(f'Return: {stats[\"Return [%]\"]:,.2f}%')
 5. **Risk Management**: Dynamic stop-loss/take-profit, time-based position management
 
 ### Critical Performance Metrics
+
 **MLWalkForwardStrategy proven results**:
+
 - Return: 14.14%, Sharpe: 3.42, Max Drawdown: -2.33%, Win Rate: 90.5%
 
 ### Optimization Guidelines
+
 - **Parameter scanning**: Use `bt.optimize()` with proper constraints
 - **Cross-validation**: Implement walk-forward optimization for ML models
 - **Overfitting prevention**: Always use out-of-sample testing periods
 
-## Current Focus: Gapless Crypto Data Integration
+## Current Focus: Market Regime Sensitivity Analysis
 
-**Active Development**: Transitioning from EURUSD test data to `gapless-crypto-data` package for authentic market data integration.
+**Active Development**: Extended timeframe testing completed with 664 trades across 6 years (2019-2024) using authentic Binance data via `gapless-crypto-data`.
 
-**Working Test Pattern**: `run_ml_strategy_with_persistence()` function serves as primary development interface with automatic output to `user_strategies/data/`:
-- **CSV**: Performance metrics and trades data
-- **HTML**: Interactive Bokeh charts for visualization
-- **Timestamped files**: Prevents overwrites during iterative development
+**Critical Discovery**: Temporal alignment effective short-term (+20.18% on 399 days) but degrades across market regimes (-4.96% on 6 years).
 
-**Next Integration Steps**:
-1. Replace `backtesting.test.EURUSD` with `gapless-crypto-data`
-2. Validate temporal integrity with authentic crypto market data
-3. Adapt feature engineering for crypto-specific market microstructure
-4. Optimize ML model parameters for crypto volatility patterns
+**Project Planning Files**:
+
+- **`user_strategies/EXTENDED_TIMEFRAME_TESTING_PLAN.yml`**: Machine-readable execution specification with results
+- **`user_strategies/EXTENDED_TIMEFRAME_ANALYSIS.md`**: Comprehensive analysis and next research directions
+- **`user_strategies/TEMPORAL_ALIGNMENT_GUIDE.md`**: Optimal configuration documentation
+- **`user_strategies/IN_SAMPLE_OUT_SAMPLE_ANALYSIS.md`**: Performance comparison analysis
+
+**Next Research Direction**: Multi-timeframe validation with regime-specific configurations:
+
+1. **14-day/14% configuration**: Medium-term stability testing
+2. **3-day/3% configuration**: High-volatility periods
+3. **Volatility-adaptive parameters**: Dynamic regime detection
 
 ## Project Intentions & Historical Context
 
@@ -229,8 +250,9 @@ This project focuses on **comprehensive testing and validation of ML walk-forwar
 1. **Framework Analysis**: Completed 98% test coverage analysis, identified 56 missing lines across core modules
 2. **Strategy Extraction**: Identified "Trading with Machine Learning" as most robust strategy implementation
 3. **Clean Architecture**: Established separation of concerns between original codebase and user modifications
-4. **ML Validation**: Verified MLWalkForwardStrategy functionality with production-ready performance metrics
-5. **Testing Infrastructure**: Created comprehensive pytest-based testing for user strategies
-6. **Persistent Output**: Implemented automatic file persistence system (CSV + HTML) in proper directory structure
+4. **Temporal Alignment Discovery**: Solved temporal mismatch (48-day predictions with 2% stops causing -99.94% losses)
+5. **Extended Testing**: 664 trades across 6 years with statistical significance achieved
+6. **Market Regime Analysis**: Identified regime sensitivity as key limitation for long-term deployment
+7. **Session Protection**: Universal `.sessions/` protection system implemented for conversation history
 
-The ultimate goal is to develop robust, temporally-sound ML trading strategies with authentic crypto market data while maintaining the integrity and testability of the underlying backtesting framework.
+The ultimate goal is to develop robust, temporally-sound ML trading strategies with regime-adaptive parameters for authentic crypto market deployment while maintaining the integrity and testability of the underlying backtesting framework.

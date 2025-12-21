@@ -22,23 +22,27 @@ Validate if crypto directional strategies work on 15-minute and 1-hour timeframe
 ## Service Level Objectives (SLOs)
 
 ### Availability
+
 - Script execution success rate: ≥99%
 - Data resampling success rate: 100%
 - Indicator calculation availability: 100%
 
 ### Correctness
+
 - Resampling accuracy: 100% (OHLC aggregation validated)
 - Indicator calculation precision: ±0.01%
 - Trade execution accuracy: 100% (no phantom trades)
 - Temporal integrity: Zero lookahead bias tolerance
 
 ### Observability
+
 - Logging coverage: 100% of resampling operations
 - Trade-by-trade audit trail: Required
 - Timeframe comparison: Side-by-side metrics
 - Bar count validation: Log before/after resampling
 
 ### Maintainability
+
 - Code reuse: ≥80% from Phase 14A and 15A
 - Out-of-the-box resampling: pandas.resample() only
 - Inline documentation: Resampling logic
@@ -55,11 +59,13 @@ Validate if crypto directional strategies work on 15-minute and 1-hour timeframe
 **Principle**: Higher timeframes reduce noise, improve signal-to-noise ratio
 
 **Academic Support**:
+
 - "Market Microstructure" (O'Hara, 1995): Intraday noise decreases with aggregation
 - "Evidence of Market Inefficiency" (Lo & MacKinlay, 1988): Longer horizons exhibit autocorrelation
 - Practitioner consensus: Daily > hourly > 5-minute for trend strategies
 
 **Expected Improvements**:
+
 - **15-minute**: 3× aggregation → 3× noise reduction (expected)
 - **1-hour**: 12× aggregation → 12× noise reduction (expected)
 - **Trend persistence**: Longer timeframes → trends last multiple bars
@@ -72,6 +78,7 @@ Validate if crypto directional strategies work on 15-minute and 1-hour timeframe
 ### Data Resampling (Out-of-the-Box)
 
 **Pandas resample() method**:
+
 ```python
 # 5-minute → 15-minute (3:1 aggregation)
 df_15m = df_5m.resample('15min').agg({
@@ -93,6 +100,7 @@ df_1h = df_5m.resample('1h').agg({
 ```
 
 **Validation**:
+
 - Check bar counts: 15-min should be ~1/3 of 5-min, 1-hour should be ~1/12
 - Verify no gaps: continuous timestamps
 - Assert OHLC integrity: Open ≤ High, Low ≤ Close, etc.
@@ -106,17 +114,20 @@ df_1h = df_5m.resample('1h').agg({
 **File**: `scripts/01_ma_crossover_15min.py`
 
 **Implementation**:
+
 1. Load 5-minute ETH data (2022-2025, 394k bars)
 2. Resample to 15-minute using pandas.resample()
 3. Run MA crossover (100/300) - best from Phase 14A
 4. Run MA crossover (50/200) - traditional baseline
 
 **Expected Data**:
+
 - 5-minute: 394,272 bars
 - 15-minute: ~131,424 bars (3:1 ratio)
 - Coverage: Same date range (2022-2025)
 
 **Success Criteria** (either config):
+
 - Win rate ≥ 45% (improvement from 5-min best 40.3%)
 - Return > 0% (profitability)
 - Trades ≥ 20 (sufficient sample)
@@ -132,17 +143,20 @@ df_1h = df_5m.resample('1h').agg({
 **File**: `scripts/02_ma_crossover_1hour.py`
 
 **Implementation**:
+
 1. Resample 5-minute data to 1-hour
 2. Run MA crossover (100/300)
 3. Run MA crossover (50/200)
 4. Run MA crossover (20/50) - shorter for lower bar count
 
 **Expected Data**:
+
 - 5-minute: 394,272 bars
 - 1-hour: ~32,856 bars (12:1 ratio)
 - Coverage: Same date range (2022-2025)
 
 **Success Criteria** (any config):
+
 - Win rate ≥ 45%
 - Return > 0%
 - Trades ≥ 10 (lower threshold due to fewer bars)
@@ -162,6 +176,7 @@ df_1h = df_5m.resample('1h').agg({
 **Test**: Run best 15-min config on ETH, BTC, SOL
 
 **Success Criteria**:
+
 - Win rate ≥ 45% on ≥2 assets
 - Return > 0% on ≥2 assets
 - Consistent behavior (not asset-specific)
@@ -180,6 +195,7 @@ df_1h = df_5m.resample('1h').agg({
 **Test**: Run best 1-hour config on ETH, BTC, SOL
 
 **Success Criteria**:
+
 - Win rate ≥ 45% on ≥2 assets
 - Return > 0% on ≥2 assets
 
@@ -197,11 +213,13 @@ df_1h = df_5m.resample('1h').agg({
 **Rationale**: MA crossover failed on 5-min AND higher timeframes → test mean reversion
 
 **Implementation**:
+
 - Test BB mean reversion (from Phase 15A) on 15-minute data
 - Test BB mean reversion on 1-hour data
 - Use same parameters: 20-period BB, 2σ, RSI 14
 
 **Success Criteria**:
+
 - Win rate ≥ 50% on either timeframe
 - Return > 0%
 
@@ -236,6 +254,7 @@ user_strategies/research/timeframe_analysis/
 ## Code Reuse Policy
 
 **Reuse from prior phases**:
+
 - ✅ MA crossover strategy class (Phase 14A)
 - ✅ BB mean reversion strategy class (Phase 15A)
 - ✅ `calculate_atr()` function
@@ -245,10 +264,12 @@ user_strategies/research/timeframe_analysis/
 - ✅ Error handling patterns
 
 **Out-of-the-box resampling**:
+
 - ✅ pandas.resample() for timeframe aggregation
 - ✅ OHLC aggregation rules (first, max, min, last, sum)
 
 **Modify**:
+
 - Data loading: Add resampling step after load
 - Validation: Add bar count checks post-resampling
 
@@ -259,6 +280,7 @@ user_strategies/research/timeframe_analysis/
 **No silent failures. No defaults. No retries.**
 
 ### Resampling Validation
+
 ```python
 # Example: Assert resampling integrity
 if df_15m.isnull().sum().sum() > 0:
@@ -280,6 +302,7 @@ if (df_15m['Open'] > df_15m['High']).any() or (df_15m['Open'] < df_15m['Low']).a
 ```
 
 ### Strategy Validation
+
 ```python
 # Example: Validate strategy results
 if stats['Return [%]'] <= 0 and stats['Win Rate [%]'] < 45:
@@ -299,6 +322,7 @@ if stats['Return [%]'] <= 0 and stats['Win Rate [%]'] < 45:
 **Metric**: MA crossover performance on 15-minute data
 
 **Criteria** (either 100/300 or 50/200):
+
 - Win rate ≥ 45%
 - Return > 0%
 - Trades ≥ 20
@@ -314,6 +338,7 @@ if stats['Return [%]'] <= 0 and stats['Win Rate [%]'] < 45:
 **Metric**: MA crossover performance on 1-hour data
 
 **Criteria** (any MA config):
+
 - Win rate ≥ 45%
 - Return > 0%
 - Trades ≥ 10
@@ -329,6 +354,7 @@ if stats['Return [%]'] <= 0 and stats['Win Rate [%]'] < 45:
 **Metric**: BB mean reversion on 15-min OR 1-hour
 
 **Criteria** (either timeframe):
+
 - Win rate ≥ 50%
 - Return > 0%
 
@@ -340,12 +366,14 @@ if stats['Return [%]'] <= 0 and stats['Win Rate [%]'] < 45:
 ## Success Metrics
 
 ### Minimum Viable (Proceed to Cross-Asset)
+
 - Win rate: ≥ 45%
 - Return: > 0%
 - Trades: ≥ 10 (1-hour) or ≥ 20 (15-min)
 - Sharpe: > 0.5
 
 ### Production Ready
+
 - Win rate: ≥ 50%
 - Return: > 5%
 - Sharpe: > 1.0
@@ -358,6 +386,7 @@ if stats['Return [%]'] <= 0 and stats['Win Rate [%]'] < 45:
 ### If Phase 16A, 16B, AND 16E All Fail
 
 **Evidence gathered**:
+
 - 5-minute: 14 strategies failed (Phases 8-15A)
 - 15-minute: MA crossover failed (Phase 16A)
 - 1-hour: MA crossover failed (Phase 16B)
@@ -400,16 +429,19 @@ if stats['Return [%]'] <= 0 and stats['Win Rate [%]'] < 45:
 ## Dependencies
 
 ### Python Packages (from pyproject.toml)
+
 - `backtesting==0.6.5`
 - `pandas==2.3.2` (resample() method)
 - `numpy==2.3.3`
 
 ### Data Sources
+
 - `user_strategies/data/raw/crypto_5m/binance_spot_ETHUSDT-5m_20220101-20250930_v2.10.0.csv`
 - `user_strategies/data/raw/crypto_5m/binance_spot_BTCUSDT-5m_20220101-20250930_v2.10.0.csv` (Phase 16C/D)
 - `user_strategies/data/raw/crypto_5m/binance_spot_SOLUSDT-5m_20220101-20250930_v2.10.0.csv` (Phase 16C/D)
 
 ### Prior Research (All 5-Minute, All Failed)
+
 - Phase 8-13A: Compression research (best: 39.7% win rate, -100% return)
 - Phase 14A: Trend following (best: 40.3% win rate, -100% return)
 - Phase 15A: Mean reversion extremes (35.7% win rate, -100% return)
@@ -420,6 +452,7 @@ if stats['Return [%]'] <= 0 and stats['Win Rate [%]'] < 45:
 ## Version History
 
 ### v1.0.0 (2025-10-05)
+
 - Initial implementation plan
 - Timeframe change: 5-min → 15-min and 1-hour
 - Reuse best strategies from Phases 14A (MA crossover) and 15A (BB reversion)
@@ -432,20 +465,25 @@ if stats['Return [%]'] <= 0 and stats['Win Rate [%]'] < 45:
 ## References
 
 **Supersedes**:
+
 - Phase 8-15A: All 5-minute crypto research (ABANDONED)
 
 **Implements**:
+
 - Option A: Timeframe change (15-min, 1-hour)
 - Resampling: pandas.resample() out-of-the-box
 
 **Theoretical Sources**:
+
 - O'Hara (1995): Market Microstructure
 - Lo & MacKinlay (1988): Market inefficiency and autocorrelation
 
 **Next Phase** (if PASS):
+
 - Phase 16C/D: Cross-asset validation
 - Production deployment
 
 **Next Action** (if FAIL):
+
 - Option B: Traditional markets (S&P 500, EUR/USD)
 - Complete abandonment of crypto directional trading

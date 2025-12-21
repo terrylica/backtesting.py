@@ -1,8 +1,7 @@
-Contributing guidelines
-=======================
+# Contributing guidelines
 
-Issues
-------
+## Issues
+
 Before reporting an issue, see if a similar issue is already open.
 Also check if a similar issue was recently closed — your bug might
 have been fixed already.
@@ -19,12 +18,14 @@ Remember that GitHub Issues supports [markdown] syntax, so
 please **wrap verbatim example code**/traceback in
 triple-backtick-[fenced code blocks],
 such as:
-~~~markdown
+
+````markdown
 ```python
 def foo():
     ...
 ```
-~~~
+````
+
 and use the post preview function before posting!
 
 Many thanks from the maintainers!
@@ -39,9 +40,8 @@ accompanied by [respective fixes/PRs].
 [fenced code blocks]: https://www.markdownguide.org/extended-syntax/#syntax-highlighting
 [respective fixes/PRs]: https://github.com/kernc/backtesting.py/blob/master/CONTRIBUTING.md#pull-requests
 
+## Installation
 
-Installation
-------------
 To install a _developmental_ version of the project,
 first [fork the project]. Then:
 
@@ -51,9 +51,8 @@ first [fork the project]. Then:
 
 [fork the project]: https://help.github.com/articles/fork-a-repo/
 
+## Testing
 
-Testing
--------
 Please write reasonable unit tests for any new / changed functionality.
 See _backtesting/test_ directory for existing tests.
 Before submitting a PR, ensure the tests pass:
@@ -65,17 +64,15 @@ Also ensure that idiomatic code style is respected by running:
     flake8 backtesting
     mypy backtesting
 
+## Documentation
 
-Documentation
--------------
 See _doc/README.md_. Besides Jupyter Notebook examples, all documentation
 is generated from [pdoc]-compatible markdown docstrings in code.
 
 [pdoc]: https://pdoc3.github.io/pdoc
 
+## Pull requests
 
-Pull requests
--------------
 A general recommended reading:
 [How to make your code reviewer fall in love with you][code-review].
 

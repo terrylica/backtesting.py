@@ -6,7 +6,7 @@
 **Scope**: ETH 5-minute data (2022-2025, 394k bars, 3.75 years)
 **Decision**: ABANDON crypto 5-minute trading research
 
-**⚠️  This document is SUPERSEDED by:**
+**⚠️ This document is SUPERSEDED by:**
 `CRYPTO_INTRADAY_RESEARCH_TERMINATION.md` (v1.0.0 FINAL)
 
 **Scope expansion**: Research continued to Phase 16A-16B (higher timeframes), all failed.
@@ -18,6 +18,7 @@
 **HARD STOP TRIGGERED**: All directional strategies fail on crypto 5-minute data.
 
 **Research Effort**:
+
 - **Phases executed**: 10 (Phases 8-15A)
 - **Strategies tested**: 14 variations
 - **Time invested**: 25+ hours
@@ -33,17 +34,17 @@
 
 ## Complete Results Timeline
 
-| Phase | Strategy | Win Rate | Return | Trades | Status |
-|-------|----------|----------|--------|--------|--------|
-| 8 | Compression detection | N/A | N/A | N/A | Setup |
-| 9 | Streak entropy | N/A | N/A | N/A | Analysis |
-| 10D | Compression breakout | 36.3% | -100.00% | 846 | Failed |
-| 11 | Extended validation | ~30% | -57.07% | 10 | Failed |
-| 12A | Mean reversion (compression) | 28.7% | -99.36% | 1,221 | Failed |
-| 13A | Compression + trend filter | 39.7% | -100.00% | 863 | Failed |
-| 14A | Dual MA crossover (50/200) | 30.2% | -100.00% | 358 | Failed |
-| 14A | **Parameter sweep (best: 100/300)** | **40.3%** | **-100.00%** | **139** | **Failed (best win rate)** |
-| **15A** | **BB mean reversion** | **35.7%** | **-100.00%** | **277** | **Failed (HARD STOP)** |
+| Phase   | Strategy                            | Win Rate  | Return       | Trades  | Status                     |
+| ------- | ----------------------------------- | --------- | ------------ | ------- | -------------------------- |
+| 8       | Compression detection               | N/A       | N/A          | N/A     | Setup                      |
+| 9       | Streak entropy                      | N/A       | N/A          | N/A     | Analysis                   |
+| 10D     | Compression breakout                | 36.3%     | -100.00%     | 846     | Failed                     |
+| 11      | Extended validation                 | ~30%      | -57.07%      | 10      | Failed                     |
+| 12A     | Mean reversion (compression)        | 28.7%     | -99.36%      | 1,221   | Failed                     |
+| 13A     | Compression + trend filter          | 39.7%     | -100.00%     | 863     | Failed                     |
+| 14A     | Dual MA crossover (50/200)          | 30.2%     | -100.00%     | 358     | Failed                     |
+| 14A     | **Parameter sweep (best: 100/300)** | **40.3%** | **-100.00%** | **139** | **Failed (best win rate)** |
+| **15A** | **BB mean reversion**               | **35.7%** | **-100.00%** | **277** | **Failed (HARD STOP)**     |
 
 ### Performance Rankings (Best to Worst Win Rate)
 
@@ -71,6 +72,7 @@
 **Hypothesis**: Crypto 5-minute exhibits strong mean reversion from Bollinger Band ±2σ extremes.
 
 **Strategy**: Bollinger Band (20-period, 2σ) + RSI (14-period) confirmation
+
 - Entry: Price touches BB ±2σ + RSI <30 or >70
 - Exit: Mean reversion to BB middle, 2ATR stop, 100-bar time stop
 
@@ -79,6 +81,7 @@
 **Conclusion**: Mean reversion from statistical extremes does NOT work on crypto 5-minute.
 
 **Hard Stop Triggered**:
+
 - Win rate 35.7% < 50% (need random baseline)
 - Return -100% ≤ 0% (need profitability)
 - Decision: ABANDON crypto 5-minute trading
@@ -90,6 +93,7 @@
 **Hypothesis**: Volatility compression zones predict breakout direction.
 
 **Approaches tested**:
+
 1. Follow breakouts (Phase 10D): 36.3% win rate
 2. Fade breakouts (Phase 12A): 28.7% win rate (WORSE)
 3. Add trend filter (Phase 13A): 39.7% win rate (better but insufficient)
@@ -103,6 +107,7 @@
 **Hypothesis**: Dual MA crossover (40+ years validation) will work on crypto.
 
 **Approaches tested**: 8 MA combinations
+
 - Fast MA: [20, 50, 100]
 - Slow MA: [100, 200, 300]
 
@@ -117,11 +122,13 @@
 **Observation**: Improving win rate does NOT guarantee positive returns.
 
 **Evidence**:
+
 - MA 100/300: 40.3% win rate, -100% return
 - Compression + trend: 39.7% win rate, -100% return
 - MA 50/100: 37.1% win rate, -100% return
 
 **Explanation**:
+
 - Winning trades: Small gains
 - Losing trades: Hit stops or max drawdown
 - Result: Losses exceed wins despite win rate improvement
@@ -152,6 +159,7 @@
    - Noise dominance: Signal-to-noise ratio very low
 
 **Conclusion**: Crypto 5-minute markets may be dominated by:
+
 - Market maker algorithms
 - High-frequency trading noise
 - Microstructure effects (bid-ask bounce, spread dynamics)
@@ -164,6 +172,7 @@
 ### Option A: Test Phase 15 (Mean Reversion from Extremes) ⭐ RECOMMENDED
 
 **Rationale**:
+
 - All trend-based strategies fail (compression + MA crossovers)
 - Evidence suggests mean-reverting market
 - Mean reversion from compression failed (28.7% win rate)
@@ -171,6 +180,7 @@
 - Next: Test mean reversion from EXTREMES (Bollinger Bands, RSI)
 
 **Strategy**: Bollinger Band (2σ) touch + RSI divergence
+
 - Entry: Price touches BB ±2σ AND RSI shows divergence
 - Exit: Mean reversion to BB midline
 - Expected: 55-60% win rate if hypothesis correct
@@ -185,6 +195,7 @@
 ### Option B: Change Timeframe to 15-Minute or Hourly ⚠️ SCOPE CHANGE
 
 **Rationale**:
+
 - 5-minute may be too short for signal persistence
 - 15-minute or hourly may have better signal-to-noise
 - Dual MA crossover validated on longer timeframes
@@ -201,6 +212,7 @@
 ### Option C: Change Asset Class to Traditional Markets ⚠️ SCOPE CHANGE
 
 **Rationale**:
+
 - Proven strategies work on stocks/futures
 - Crypto may be fundamentally different
 - Test same strategies on S&P 500 or forex
@@ -217,6 +229,7 @@
 ### Option D: Test Market Making (Bid-Ask Spread Capture) ⚠️ HIGH COMPLEXITY
 
 **Rationale**:
+
 - Directional strategies fail
 - Market making works in choppy/mean-reverting markets
 - Requires bid-ask spread data and inventory management
@@ -233,12 +246,14 @@
 ### Option E: Abandon Crypto 5-Minute Trading ⭐ PRUDENT
 
 **Rationale**:
+
 - 9 phases tested, ALL fail
 - Best: 40.3% win rate, -100% return
 - Evidence: Market structure incompatible with directional strategies
 - Resource investment: 20+ hours with zero viable results
 
 **Alternative Focus**:
+
 1. Crypto daily/weekly trading (longer trends)
 2. Traditional markets (stocks/futures) with proven strategies
 3. Market making (institutional approach)
@@ -256,6 +271,7 @@
 ### Immediate Action: Test Option A (Phase 15) with Hard Stop
 
 **Plan**:
+
 1. Implement Phase 15: Mean Reversion from Bollinger Band Extremes
 2. Hard stop criteria:
    - If win rate < 50%: ABANDON crypto 5-minute entirely
@@ -265,6 +281,7 @@
 **Timeline**: 1 day maximum
 
 **Rationale**:
+
 - One final test of mean reversion hypothesis
 - If fails: 10 phases tested, all approaches exhausted
 - If succeeds: Validates mean-reverting market hypothesis
@@ -274,6 +291,7 @@
 ### Long-Term Recommendations
 
 **If Phase 15 Succeeds** (win rate >50%, return >0%):
+
 1. Validate on BTC, SOL (cross-asset)
 2. Add regime filters (volatility-adaptive)
 3. Optimize parameters (BB period, RSI thresholds)
@@ -281,6 +299,7 @@
 5. Production deployment
 
 **If Phase 15 Fails** (win rate <50% OR return <0%):
+
 1. **ABANDON crypto 5-minute trading**
 2. Redirect to:
    - Crypto daily/weekly (longer timeframe)
@@ -292,6 +311,7 @@
 ## Research Artifacts
 
 ### Compression Research Files
+
 ```
 user_strategies/research/compression_breakout_research/
 ├── scripts/
@@ -307,6 +327,7 @@ user_strategies/research/compression_breakout_research/
 ```
 
 ### Proven Strategies Files
+
 ```
 user_strategies/research/proven_strategies/
 ├── scripts/
@@ -321,6 +342,7 @@ user_strategies/research/proven_strategies/
 ```
 
 ### Summary Files
+
 ```
 user_strategies/research/
 └── CRYPTO_5MIN_RESEARCH_SUMMARY.md                 # This file
@@ -349,6 +371,7 @@ user_strategies/research/
 ## Statistics
 
 ### Resource Investment
+
 - **Phases**: 10 (Phase 8-15A)
 - **Scripts written**: 15+
 - **Strategies tested**: 14 variations
@@ -357,6 +380,7 @@ user_strategies/research/
 - **Time invested**: 25+ hours
 
 ### Performance Summary
+
 - **Best win rate**: 40.3% (MA 100/300)
 - **Worst win rate**: 28.7% (mean reversion compression)
 - **Best return**: -99.36% (mean reversion compression - least catastrophic)
@@ -364,6 +388,7 @@ user_strategies/research/
 - **Average return**: ~-100%
 
 ### Conclusion Statistics
+
 - **Strategies with positive return**: 0 / 14 (0%)
 - **Strategies with >50% win rate**: 0 / 14 (0%)
 - **Strategies with >45% win rate**: 0 / 14 (0%)
@@ -375,6 +400,7 @@ user_strategies/research/
 ## Version History
 
 ### v2.0.0 (2025-10-05) - FINAL
+
 - Phase 15A complete: Bollinger Band mean reversion failed
 - Hard stop triggered: Win rate 35.7%, return -100%
 - Research CONCLUDED: 10 phases, 14 strategies, all failed
@@ -382,6 +408,7 @@ user_strategies/research/
 - Recommendation: Test 15-min/1-hour or traditional markets
 
 ### v1.0.0 (2025-10-05)
+
 - Initial summary after Phase 14A completion
 - Compression research (Phases 8-13A) archived
 - Trend following (Phase 14A) tested and failed
@@ -392,22 +419,26 @@ user_strategies/research/
 ## References
 
 **Archived Research** (ALL FAILED):
+
 - Compression Breakout Research (Phases 8-13A): ABANDONED
 - Proven Trend Following (Phase 14A): FAILED
 - Mean Reversion from Extremes (Phase 15A): FAILED (HARD STOP)
 
 **Final Status**:
+
 - Research CONCLUDED: 10 phases, 14 strategies, 0 viable
 - Decision: ABANDON crypto 5-minute trading
 - Hard stop triggered at Phase 15A
 
 **Recommended Next Steps**:
+
 1. **Option A**: Test 15-minute or 1-hour crypto data (higher timeframe)
 2. **Option B**: Test traditional markets (S&P 500, EUR/USD) with same strategies
 3. **Option C**: Market making approach (institutional, complex)
 4. **Option D**: Abandon HFT, focus on daily/weekly strategies
 
 **Documentation**:
+
 - Complete research summary: `CRYPTO_5MIN_RESEARCH_SUMMARY.md` (this file)
 - Phase 15A failure report: `mean_reversion_extremes/results/phase_15_mean_reversion/PHASE_15A_HARD_STOP_FAILURE_REPORT.md`
 - All phase implementations: `compression_breakout_research/`, `proven_strategies/`, `mean_reversion_extremes/`

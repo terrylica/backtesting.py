@@ -20,23 +20,27 @@ Implement and validate proven trading strategies with established theoretical fo
 ## Service Level Objectives (SLOs)
 
 ### Availability
+
 - Script execution success rate: ≥99%
 - Data loading success rate: 100%
 - Indicator calculation availability: 100%
 
 ### Correctness
+
 - Indicator calculation precision: ±0.01%
 - Trade execution accuracy: 100% (no phantom trades)
 - Temporal integrity: Zero lookahead bias tolerance
 - Signal generation accuracy: 100% (matches theoretical definition)
 
 ### Observability
+
 - Logging coverage: 100% of signal generation
 - Trade-by-trade audit trail: Required
 - Per-strategy performance tracking: CSV output
 - Indicator state logging: All crossovers, touches, divergences
 
 ### Maintainability
+
 - Code reuse from backtesting.py lib: ≥60%
 - Out-of-the-box indicators: Prefer pandas/numpy over custom
 - Inline documentation: All signal logic
@@ -50,18 +54,19 @@ Implement and validate proven trading strategies with established theoretical fo
 
 ### Prioritization Matrix
 
-| Strategy | Theory Strength | Implementation Complexity | Expected Win Rate | Expected Sharpe | Priority |
-|----------|----------------|--------------------------|-------------------|----------------|----------|
-| Trend Following | High (40+ years) | Low (MA crossovers) | 40-45% | >0.5 | **1** |
-| Mean Reversion Extremes | High (30+ years) | Low (Bollinger/RSI) | 55-60% | >1.0 | **2** |
-| Volume Breakouts | Medium (20+ years) | Medium (volume analysis) | 45-50% | >0.7 | **3** |
-| Market Making | High (institutional) | High (inventory risk) | N/A | >2.0 | **4** |
+| Strategy                | Theory Strength      | Implementation Complexity | Expected Win Rate | Expected Sharpe | Priority |
+| ----------------------- | -------------------- | ------------------------- | ----------------- | --------------- | -------- |
+| Trend Following         | High (40+ years)     | Low (MA crossovers)       | 40-45%            | >0.5            | **1**    |
+| Mean Reversion Extremes | High (30+ years)     | Low (Bollinger/RSI)       | 55-60%            | >1.0            | **2**    |
+| Volume Breakouts        | Medium (20+ years)   | Medium (volume analysis)  | 45-50%            | >0.7            | **3**    |
+| Market Making           | High (institutional) | High (inventory risk)     | N/A               | >2.0            | **4**    |
 
 ### Selection Decision
 
 **Start with Priority 1: Trend Following**
 
 **Rationale**:
+
 - Lowest implementation complexity
 - Longest track record (Donchian 1960s, Turtle Traders 1980s)
 - Works across all markets (stocks, futures, crypto)
@@ -75,28 +80,33 @@ Implement and validate proven trading strategies with established theoretical fo
 ### Strategy 1: Dual Moving Average Crossover (Trend Following)
 
 **Theoretical Foundation**:
+
 - Source: "Technical Analysis of Stock Trends" (Edwards & Magee, 1948)
 - Validation: Turtle Trading System (Dennis & Eckhardt, 1983)
 - Academic: "Momentum and Reversal" (Jegadeesh & Titman, 1993)
 
 **Signal Generation**:
+
 ```
 Fast MA (50-period) crosses above Slow MA (200-period) → LONG
 Fast MA (50-period) crosses below Slow MA (200-period) → SHORT
 ```
 
 **Confirmation Filters**:
+
 1. ADX > 25 (trend strength filter)
 2. ATR percentile > 50% (volatility expansion, opposite of compression)
 3. Volume > 20-period average (participation confirmation)
 
 **Exit Logic**:
+
 - Opposite crossover signal
 - Stop: 2.0 × ATR
 - Trailing stop: 3.0 × ATR from highest high (long) or lowest low (short)
 - Max hold: 500 bars (100 hours @ 5-min)
 
 **Expected Performance**:
+
 - Win rate: 40-45% (trend following typically <50%)
 - Profit factor: >1.5 (winners larger than losers)
 - Sharpe: >0.5
@@ -111,6 +121,7 @@ Fast MA (50-period) crosses below Slow MA (200-period) → SHORT
 **File**: `scripts/01_dual_ma_crossover.py`
 
 **Indicators** (out-of-the-box):
+
 ```python
 # Fast and slow moving averages
 self.ma_fast = self.I(lambda: df['Close'].rolling(50).mean(), name='MA_Fast')
@@ -121,6 +132,7 @@ self.atr = self.I(lambda: calculate_atr(df, 14), name='ATR')
 ```
 
 **Entry Logic**:
+
 ```python
 # Long entry: Fast crosses above slow
 if self.ma_fast[-2] <= self.ma_slow[-2] and self.ma_fast[-1] > self.ma_slow[-1]:
@@ -134,6 +146,7 @@ if self.ma_fast[-2] >= self.ma_slow[-2] and self.ma_fast[-1] < self.ma_slow[-1]:
 ```
 
 **Exit Logic**:
+
 ```python
 # Exit on opposite crossover
 if self.position.is_long and self.ma_fast[-1] < self.ma_slow[-1]:
@@ -151,6 +164,7 @@ if self.position.is_long:
 **Test**: ETH full dataset (2022-2025, 394k bars)
 
 **Gate 1 Criteria**:
+
 - Win rate ≥ 35% (trend following baseline)
 - Return > 0% (profitability)
 - Trades ≥ 10 (sufficient signals)
@@ -165,6 +179,7 @@ if self.position.is_long:
 **File**: `scripts/02_dual_ma_crossover_filtered.py`
 
 **Changes from Phase 14A**:
+
 ```python
 # Add ADX for trend strength
 def calculate_adx(df, period=14):
@@ -205,6 +220,7 @@ if (self.ma_fast[-2] <= self.ma_slow[-2] and
 **Test**: ETH full dataset
 
 **Gate 2 Criteria**:
+
 - Win rate ≥ 40% (improvement from baseline)
 - Return > 5% (meaningful profit)
 - Sharpe > 0.5 (validated risk-adjusted performance)
@@ -221,6 +237,7 @@ if (self.ma_fast[-2] <= self.ma_slow[-2] and
 **Test**: Run Phase 14B strategy on ETH, BTC, SOL
 
 **Success Criteria**:
+
 - Win rate ≥ 40% on ≥2 assets
 - Return > 0% on ≥2 assets
 - Sharpe > 0.5 on ≥1 asset
@@ -236,6 +253,7 @@ if (self.ma_fast[-2] <= self.ma_slow[-2] and
 **File**: `scripts/04_dual_ma_crossover_optimization.py`
 
 **Parameters to sweep**:
+
 - `ma_fast_period`: [20, 50, 100]
 - `ma_slow_period`: [100, 200, 300]
 - `stop_atr_multiple`: [1.5, 2.0, 2.5]
@@ -244,6 +262,7 @@ if (self.ma_fast[-2] <= self.ma_slow[-2] and
 **Grid**: 3 × 3 × 3 × 3 = 81 combinations per asset
 
 **Optimization Method**:
+
 ```python
 # Use backtesting.py built-in optimize()
 stats = bt.optimize(
@@ -257,11 +276,13 @@ stats = bt.optimize(
 ```
 
 **Output**:
+
 - Best configuration per asset
 - Universal configuration (works across assets)
 - Walk-forward validation results
 
 **Success Criteria**:
+
 - Universal config: Sharpe > 1.0 on ≥2 assets
 - Return > 10% on best asset
 - Win rate ≥ 45% on best config
@@ -295,6 +316,7 @@ user_strategies/research/proven_strategies/
 ## Code Reuse Policy
 
 **Reuse from backtesting.py lib**:
+
 - ✅ Out-of-the-box: `pandas.rolling().mean()` for MA
 - ✅ From Phase 10D: `calculate_atr()` function
 - ✅ From Phase 10D: `calculate_percentile_rank()` function
@@ -302,11 +324,13 @@ user_strategies/research/proven_strategies/
 - ✅ From backtesting.py: `bt.optimize()` for parameter sweeps
 
 **Do NOT reuse from compression research**:
+
 - ❌ Multi-timeframe ATR compression filter
 - ❌ Regime filtering logic
 - ❌ Compression-based entry signals
 
 **New implementations** (out-of-the-box):
+
 - ADX calculation: Standard formula, pandas/numpy only
 - Trailing stop: `max()` function on rolling high/low
 - Crossover detection: Compare `[-2]` vs `[-1]` values
@@ -318,6 +342,7 @@ user_strategies/research/proven_strategies/
 **No silent failures. No defaults. No retries.**
 
 ### Data Validation
+
 ```python
 # Example: Assert data integrity
 if df.isnull().sum().sum() > 0:
@@ -328,6 +353,7 @@ if len(df) < 250:
 ```
 
 ### Indicator Validation
+
 ```python
 # Example: Validate indicator state
 if pd.isna(self.ma_fast[-1]) or pd.isna(self.ma_slow[-1]):
@@ -338,6 +364,7 @@ if self.atr[-1] <= 0:
 ```
 
 ### Gate Validation
+
 ```python
 # Example: Hard stop on gate failure
 if stats['Return [%]'] <= 0:
@@ -358,6 +385,7 @@ if stats['Win Rate [%]'] < 35:
 **Metric**: Trend following baseline performance
 
 **Criteria**:
+
 - Win rate ≥ 35% (trend following baseline)
 - Return > 0% (profitability)
 - Trades ≥ 10 (sufficient signals)
@@ -373,6 +401,7 @@ if stats['Win Rate [%]'] < 35:
 **Metric**: Performance with confirmation filters
 
 **Criteria**:
+
 - Win rate ≥ 40% (improvement)
 - Return > 5% (meaningful profit)
 - Sharpe > 0.5 (validated performance)
@@ -388,6 +417,7 @@ if stats['Win Rate [%]'] < 35:
 **Metric**: Multi-asset consistency
 
 **Criteria**:
+
 - Win rate ≥ 40% on ≥2 assets
 - Return > 0% on ≥2 assets
 - Sharpe > 0.5 on ≥1 asset
@@ -402,6 +432,7 @@ if stats['Win Rate [%]'] < 35:
 **Metric**: Optimized configuration performance
 
 **Criteria**:
+
 - Universal config: Sharpe > 1.0 on ≥2 assets
 - Return > 10% on best asset
 - Win rate ≥ 45% on best config
@@ -415,6 +446,7 @@ if stats['Win Rate [%]'] < 35:
 ## Success Metrics
 
 ### Minimum Viable (Proceed to Production)
+
 - Win rate: ≥ 40% on best asset
 - Return: > 10% on 3.75-year backtest
 - Sharpe: > 1.0
@@ -422,6 +454,7 @@ if stats['Win Rate [%]'] < 35:
 - Cross-asset: Works on ≥2 of 3 assets
 
 ### Production Ready (Live trading candidate)
+
 - Win rate: ≥ 45% on ≥2 assets
 - Return: > 20% annualized
 - Sharpe: > 1.5
@@ -458,16 +491,19 @@ if stats['Win Rate [%]'] < 35:
 ## Dependencies
 
 ### Python Packages (from pyproject.toml)
+
 - `backtesting==0.6.5`
 - `pandas==2.3.2`
 - `numpy==2.3.3`
 
 ### Data Sources
+
 - `user_strategies/data/raw/crypto_5m/binance_spot_ETHUSDT-5m_20220101-20250930_v2.10.0.csv`
 - `user_strategies/data/raw/crypto_5m/binance_spot_BTCUSDT-5m_20220101-20250930_v2.10.0.csv`
 - `user_strategies/data/raw/crypto_5m/binance_spot_SOLUSDT-5m_20220101-20250930_v2.10.0.csv`
 
 ### Prior Research (Archived)
+
 - Phase 8-13A: Compression research (ABANDONED)
 - Best compression result: 39.7% win rate, -100% return
 
@@ -489,6 +525,7 @@ if stats['Win Rate [%]'] < 35:
 ## Version History
 
 ### v1.0.0 (2025-10-05)
+
 - Initial implementation plan
 - Dual MA crossover strategy selected (Priority 1)
 - 4-day timeline with decision gates
@@ -500,24 +537,29 @@ if stats['Win Rate [%]'] < 35:
 ## References
 
 **Supersedes**:
+
 - Phase 8-13A: Compression breakout research (ABANDONED)
 - Phase 13 Ensemble Implementation (FAILED at Gate 1)
 
 **Implements**:
+
 - Option A: Proven strategies with academic validation
 - Trend following: Dual moving average crossover
 
 **Theoretical Sources**:
+
 - Edwards & Magee (1948): Technical Analysis of Stock Trends
 - Dennis & Eckhardt (1983): Turtle Trading System
 - Jegadeesh & Titman (1993): Momentum and Reversal
 
 **Next Phase** (if Phase 14 succeeds):
+
 - Production deployment with risk management
 - Live paper trading on testnet
 - Walk-forward validation on new data
 
 **Next Phase** (if Phase 14 fails):
+
 - Phase 15: Mean Reversion from Extremes
 - Phase 16: Volume-Confirmed Breakouts
 - Phase 17: Market Making (advanced)

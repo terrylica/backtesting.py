@@ -21,11 +21,13 @@ Validate if crypto 5-minute markets are mean-reverting at price extremes using B
 ## Service Level Objectives (SLOs)
 
 ### Availability
+
 - Script execution success rate: ≥99%
 - Data loading success rate: 100%
 - Indicator calculation availability: 100%
 
 ### Correctness
+
 - Indicator calculation precision: ±0.01%
 - Trade execution accuracy: 100% (no phantom trades)
 - Temporal integrity: Zero lookahead bias tolerance
@@ -33,12 +35,14 @@ Validate if crypto 5-minute markets are mean-reverting at price extremes using B
 - RSI calculation: Standard Wilder smoothing
 
 ### Observability
+
 - Logging coverage: 100% of entry signals
 - Trade-by-trade audit trail: Required
 - BB touch classification: Upper/lower band identification
 - RSI divergence logging: All divergence events captured
 
 ### Maintainability
+
 - Code reuse: ≥70% from prior phases (ATR, data loading)
 - Out-of-the-box indicators: pandas.rolling().std(), RSI standard formula
 - Inline documentation: All signal logic
@@ -55,11 +59,13 @@ Validate if crypto 5-minute markets are mean-reverting at price extremes using B
 **Principle**: Price reverts to mean (moving average) after touching ±2σ bands
 
 **Academic Support**:
+
 - "Bollinger on Bollinger Bands" (Bollinger, 2001)
 - Statistical basis: 95% of data within ±2σ under normal distribution
 - Market application: Price extremes are unsustainable, revert to mean
 
 **Signal Generation**:
+
 - **Long entry**: Price touches lower band (oversold)
 - **Short entry**: Price touches upper band (overbought)
 - **Exit**: Price reverts to middle band (SMA)
@@ -69,12 +75,14 @@ Validate if crypto 5-minute markets are mean-reverting at price extremes using B
 **Principle**: Momentum divergence precedes price reversal
 
 **Academic Support**:
+
 - "New Concepts in Technical Trading Systems" (Wilder, 1978)
 - Divergence types:
   - Bullish: Price makes lower low, RSI makes higher low
   - Bearish: Price makes higher high, RSI makes lower high
 
 **Confirmation Filter**:
+
 - Strengthens BB signal
 - Reduces false entries at extremes
 
@@ -85,6 +93,7 @@ Validate if crypto 5-minute markets are mean-reverting at price extremes using B
 ### Strategy: Bollinger Band Mean Reversion
 
 **Indicators** (out-of-the-box):
+
 ```python
 # Bollinger Bands (20-period, 2-sigma)
 bb_period = 20
@@ -98,6 +107,7 @@ bb_middle = sma
 ```
 
 **RSI** (standard Wilder smoothing):
+
 ```python
 # RSI (14-period)
 def calculate_rsi(close, period=14):
@@ -117,6 +127,7 @@ def calculate_rsi(close, period=14):
 ### Entry Logic
 
 **LONG Entry** (oversold reversal):
+
 ```python
 # Conditions (ALL must be true):
 1. Price touches or breaks below lower BB
@@ -132,6 +143,7 @@ if (close <= bb_lower[-1] and
 ```
 
 **SHORT Entry** (overbought reversal):
+
 ```python
 # Conditions (ALL must be true):
 1. Price touches or breaks above upper BB
@@ -149,6 +161,7 @@ if (close >= bb_upper[-1] and
 ### Exit Logic
 
 **Exit Conditions**:
+
 1. **Target**: Price reaches BB middle (mean reversion complete)
 2. **Stop loss**: 2.0 × ATR from entry
 3. **Time stop**: 100 bars (8.3 hours @ 5-min) without mean reversion
@@ -163,6 +176,7 @@ if (close >= bb_upper[-1] and
 **File**: `scripts/01_bollinger_mean_reversion.py`
 
 **Implementation**:
+
 - Bollinger Bands: 20-period SMA, 2σ
 - RSI: 14-period Wilder smoothing
 - Entry: BB touch + RSI <30 or >70
@@ -171,6 +185,7 @@ if (close >= bb_upper[-1] and
 **Test**: ETH full dataset (2022-2025, 394k bars)
 
 **HARD STOP Criteria** (Gate 1):
+
 - Win rate ≥ 50% (random baseline)
 - Return > 0% (profitability)
 - Trades ≥ 20 (sufficient sample)
@@ -189,6 +204,7 @@ if (close >= bb_upper[-1] and
 **File**: `scripts/02_bollinger_rsi_divergence.py`
 
 **Changes from Phase 15A**:
+
 ```python
 # Divergence detection
 def detect_bullish_divergence(price, rsi, lookback=5):
@@ -208,6 +224,7 @@ if (close <= bb_lower[-1] and
 **Test**: ETH full dataset
 
 **Gate 2 Criteria**:
+
 - Win rate ≥ 55% (improvement from baseline)
 - Return > 5% (meaningful profit)
 - Sharpe > 0.5 (validated performance)
@@ -226,6 +243,7 @@ if (close <= bb_lower[-1] and
 **Test**: Run best config on ETH, BTC, SOL
 
 **Success Criteria**:
+
 - Win rate ≥ 50% on ≥2 assets
 - Return > 0% on ≥2 assets
 - Consistent behavior (not asset-specific overfitting)
@@ -242,6 +260,7 @@ if (close <= bb_lower[-1] and
 **File**: `scripts/04_bollinger_optimization.py`
 
 **Parameters to sweep**:
+
 - `bb_period`: [10, 20, 30]
 - `bb_std`: [1.5, 2.0, 2.5]
 - `rsi_period`: [10, 14, 20]
@@ -251,6 +270,7 @@ if (close <= bb_lower[-1] and
 **Output**: Best configuration per asset, universal configuration
 
 **Success Criteria**:
+
 - Universal config: Win rate ≥55%, Sharpe >1.0 on ≥2 assets
 - Return > 10% on best asset
 
@@ -283,17 +303,20 @@ user_strategies/research/mean_reversion_extremes/
 ## Code Reuse Policy
 
 **Reuse from prior phases**:
+
 - ✅ `calculate_atr()` (Phase 10D)
 - ✅ `load_5m_data()` (Phase 10D)
 - ✅ Data validation patterns
 - ✅ Position tracking logic
 
 **Out-of-the-box implementations**:
+
 - ✅ Bollinger Bands: `pandas.rolling().mean()`, `pandas.rolling().std()`
 - ✅ RSI: Standard Wilder formula (EMA with alpha=1/14)
 - ✅ Divergence: Simple lookback comparison
 
 **Do NOT reuse**:
+
 - ❌ Compression detection
 - ❌ Regime filtering
 - ❌ MA crossover logic
@@ -305,6 +328,7 @@ user_strategies/research/mean_reversion_extremes/
 **No silent failures. No defaults. No retries.**
 
 ### Data Validation
+
 ```python
 # Example: Assert data integrity
 if df.isnull().sum().sum() > 0:
@@ -315,6 +339,7 @@ if len(df) < 200:
 ```
 
 ### Indicator Validation
+
 ```python
 # Example: Validate BB calculation
 if pd.isna(bb_upper[-1]) or pd.isna(bb_lower[-1]):
@@ -325,6 +350,7 @@ if bb_lower[-1] >= bb_upper[-1]:
 ```
 
 ### Hard Stop Validation
+
 ```python
 # Example: Enforce hard stop criteria
 if stats['Win Rate [%]'] < 50:
@@ -351,6 +377,7 @@ if stats['Return [%]'] <= 0:
 **Metric**: Bollinger Band mean reversion baseline
 
 **HARD STOP Criteria** (ALL must pass):
+
 - Win rate ≥ 50% (random baseline)
 - Return > 0% (profitability)
 - Trades ≥ 20 (sufficient sample)
@@ -366,6 +393,7 @@ if stats['Return [%]'] <= 0:
 **Metric**: Performance with RSI divergence filter
 
 **Criteria**:
+
 - Win rate ≥ 55% (improvement)
 - Return > 5% (meaningful profit)
 - Sharpe > 0.5
@@ -380,6 +408,7 @@ if stats['Return [%]'] <= 0:
 **Metric**: Cross-asset consistency
 
 **Criteria**:
+
 - Win rate ≥ 50% on ≥2 assets
 - Return > 0% on ≥2 assets
 
@@ -393,6 +422,7 @@ if stats['Return [%]'] <= 0:
 **Metric**: Optimized configuration
 
 **Criteria**:
+
 - Win rate ≥ 55% on ≥2 assets
 - Return > 10% on best asset
 - Sharpe > 1.0
@@ -405,6 +435,7 @@ if stats['Return [%]'] <= 0:
 ## Success Metrics
 
 ### Minimum Viable (HARD STOP Criteria)
+
 - Win rate: ≥ 50%
 - Return: > 0%
 - Trades: ≥ 20
@@ -413,6 +444,7 @@ if stats['Return [%]'] <= 0:
 **If NOT met**: ABANDON crypto 5-minute trading
 
 ### Production Ready
+
 - Win rate: ≥ 55%
 - Return: > 10% (over 3.75 years)
 - Sharpe: > 1.0
@@ -425,6 +457,7 @@ if stats['Return [%]'] <= 0:
 ### If Phase 15A Fails Hard Stop
 
 **Evidence gathered across 10 phases**:
+
 - Compression strategies: Best 39.7% win rate, -100% return
 - Trend following: Best 40.3% win rate, -100% return
 - Mean reversion extremes: <50% win rate or <0% return (if fails)
@@ -463,16 +496,19 @@ if stats['Return [%]'] <= 0:
 ## Dependencies
 
 ### Python Packages (from pyproject.toml)
+
 - `backtesting==0.6.5`
 - `pandas==2.3.2`
 - `numpy==2.3.3`
 
 ### Data Sources
+
 - `user_strategies/data/raw/crypto_5m/binance_spot_ETHUSDT-5m_20220101-20250930_v2.10.0.csv`
 - `user_strategies/data/raw/crypto_5m/binance_spot_BTCUSDT-5m_20220101-20250930_v2.10.0.csv` (Phase 15C)
 - `user_strategies/data/raw/crypto_5m/binance_spot_SOLUSDT-5m_20220101-20250930_v2.10.0.csv` (Phase 15C)
 
 ### Prior Research (All Failed)
+
 - Phase 8-13A: Compression research (best: 39.7% win rate, -100% return)
 - Phase 14A: Trend following (best: 40.3% win rate, -100% return)
 - Total: 9 phases, 12 strategies, 0 viable results
@@ -482,6 +518,7 @@ if stats['Return [%]'] <= 0:
 ## Version History
 
 ### v1.0.0 (2025-10-05)
+
 - Initial implementation plan
 - Bollinger Band + RSI mean reversion strategy
 - HARD STOP criteria defined: Win rate <50% OR return <0% → ABANDON
@@ -493,21 +530,26 @@ if stats['Return [%]'] <= 0:
 ## References
 
 **Supersedes**:
+
 - Phase 8-14A: All prior crypto 5-minute research (FAILED)
 
 **Implements**:
+
 - Bollinger Band mean reversion (Bollinger, 2001)
 - RSI divergence (Wilder, 1978)
 
 **Theoretical Sources**:
+
 - "Bollinger on Bollinger Bands" (John Bollinger, 2001)
 - "New Concepts in Technical Trading Systems" (J. Welles Wilder, 1978)
 
 **Next Phase** (if PASS):
+
 - Phase 15B-15D: Iterative improvements
 - Production deployment
 
 **Next Action** (if FAIL):
+
 - ABANDON crypto 5-minute trading
 - Escalate decision: Change timeframe, asset class, or approach
 - Complete research summary: 10 phases, 13+ strategies tested, all failed

@@ -12,28 +12,31 @@
 
 ### Critical Findings
 
-| Metric | Result | Interpretation |
-|--------|--------|----------------|
-| **Total Events Analyzed** | 34,375 | Statistically significant sample size |
-| **Overall Favorable Rate** | 33.0% | **ANTI-PREDICTIVE** (worse than 50% random) |
-| **Median MFE/\|MAE\| Ratio** | 0.82-0.96 | **Adverse excursion dominates** |
-| **Best Configuration** | ETH 5% threshold, 50-bar horizon | 46.3% (still below random, n=41) |
-| **Cross-Symbol Consistency** | All 3 symbols POOR | Confirms systematic failure |
+| Metric                       | Result                           | Interpretation                              |
+| ---------------------------- | -------------------------------- | ------------------------------------------- |
+| **Total Events Analyzed**    | 34,375                           | Statistically significant sample size       |
+| **Overall Favorable Rate**   | 33.0%                            | **ANTI-PREDICTIVE** (worse than 50% random) |
+| **Median MFE/\|MAE\| Ratio** | 0.82-0.96                        | **Adverse excursion dominates**             |
+| **Best Configuration**       | ETH 5% threshold, 50-bar horizon | 46.3% (still below random, n=41)            |
+| **Cross-Symbol Consistency** | All 3 symbols POOR               | Confirms systematic failure                 |
 
 ---
 
 ## Research Methodology
 
 ### Volatility Compression Detection
+
 - **Timeframes:** 5m, 15m, 30m
 - **Metric:** ATR(14) percentile rank over 150-bar rolling window
 - **Thresholds Tested:** 5%, 10%, 15%, 20% (all three timeframes must be below threshold)
 
 ### Breakout Identification
+
 - **Signal:** Price exceeds 20-bar high (bullish) or 20-bar low (bearish)
 - **Entry:** Bar AFTER breakout confirmation (realistic execution)
 
 ### Quality Measurement
+
 - **Forward Horizons:** 10, 20, 30, 50, 100 bars
 - **MAE:** Maximum Adverse Excursion (worst drawdown from entry)
 - **MFE:** Maximum Favorable Excursion (best profit from entry)
@@ -46,6 +49,7 @@
 ## Detailed Results by Symbol
 
 ### Bitcoin (BTC)
+
 ```
 Total Events:        14,605
 Favorable Rate:      33.5% (vs 50% random)
@@ -65,6 +69,7 @@ Best Configuration:
 ```
 
 ### Ethereum (ETH)
+
 ```
 Total Events:        8,315
 Favorable Rate:      33.7%
@@ -84,6 +89,7 @@ Best Configuration:
 ```
 
 ### Solana (SOL)
+
 ```
 Total Events:        11,455
 Favorable Rate:      31.8%
@@ -110,12 +116,12 @@ Best Configuration:
 
 **None of the 120 tested configurations (3 symbols × 4 thresholds × 5 horizons × 2 directions) achieved >50% favorable rate with sufficient sample size (n≥30).**
 
-| Threshold | Avg Favorable Rate | Interpretation |
-|-----------|-------------------|----------------|
-| 5% (extreme compression) | 33.2% | Most selective, still poor |
-| 10% (strict compression) | 33.4% | No improvement |
-| 15% (moderate compression) | 32.8% | Worse |
-| 20% (loose compression) | 32.8% | No difference |
+| Threshold                  | Avg Favorable Rate | Interpretation             |
+| -------------------------- | ------------------ | -------------------------- |
+| 5% (extreme compression)   | 33.2%              | Most selective, still poor |
+| 10% (strict compression)   | 33.4%              | No improvement             |
+| 15% (moderate compression) | 32.8%              | Worse                      |
+| 20% (loose compression)    | 32.8%              | No difference              |
 
 **Conclusion:** Compression severity is IRRELEVANT - the hypothesis itself is flawed.
 
@@ -128,19 +134,20 @@ Best Configuration:
 ### 3. Mean Reversion Dominates
 
 The data suggests volatility compression is followed by **mean reversion**, not directional expansion:
+
 - Price breaks out, then immediately reverses back into range
 - False breakouts are the norm, not the exception
 - Low volatility indicates consolidation, not pre-breakout accumulation
 
 ### 4. Horizon Independence
 
-| Horizon | Avg Favorable Rate |
-|---------|-------------------|
-| 10 bars (50 min) | 32.9% |
-| 20 bars (1h 40m) | 33.1% |
-| 30 bars (2h 30m) | 33.0% |
-| 50 bars (4h 10m) | 33.5% |
-| 100 bars (8h 20m) | 33.7% |
+| Horizon           | Avg Favorable Rate |
+| ----------------- | ------------------ |
+| 10 bars (50 min)  | 32.9%              |
+| 20 bars (1h 40m)  | 33.1%              |
+| 30 bars (2h 30m)  | 33.0%              |
+| 50 bars (4h 10m)  | 33.5%              |
+| 100 bars (8h 20m) | 33.7%              |
 
 **Result:** Breakout quality does NOT improve over longer horizons. Mean reversion persists.
 
@@ -151,6 +158,7 @@ The data suggests volatility compression is followed by **mean reversion**, not 
 ### Sample Size Validation
 
 All configurations exceed minimum sample requirements:
+
 - Smallest cell (ETH 5% threshold, any direction/horizon): n=41
 - Typical cell size: n=200-450
 - Largest cell (BTC 20% threshold, all horizons): n=6,075
@@ -160,6 +168,7 @@ All configurations exceed minimum sample requirements:
 ### Distribution Analysis
 
 **Quartile Analysis (Median ratios across all events):**
+
 ```
 25th percentile: 0.25-0.36 (extreme adverse bias)
 50th percentile: 0.82-0.96 (adverse bias)
@@ -174,18 +183,19 @@ All configurations exceed minimum sample requirements:
 
 This is the **8th failed approach** in comprehensive BTC trading research:
 
-| # | Approach | Method | Result | Sample Size |
-|---|----------|--------|--------|-------------|
-| 1 | 3-Bar Thrust Pattern | Custom pattern detection | 50% win, -34% return | 293 trades |
-| 2 | Manual Features | 8 technical indicators | 52.5% accuracy | Research only |
-| 3 | OpenFE Automation | 185 auto-generated features | 49.7% accuracy | Research only |
-| 4 | tsfresh Time Series | 794 time series features | 51.5% accuracy | Research only |
-| 5 | Multi-Timeframe Regimes | 15m/30m/1h/2h resampling | 42-45% accuracy | Research only |
-| 6 | ML Walk-Forward | 6-year backtest | -4.96% return | 664 trades |
-| 7 | Volatility Breakout Strategy | Multi-TF compression filter | 31.9% win, -95% return | 260 trades |
-| **8** | **Volatility Compression Research** | **MAE/MFE diagnostic** | **33.0% favorable** | **34,375 events** |
+| #     | Approach                            | Method                      | Result                 | Sample Size       |
+| ----- | ----------------------------------- | --------------------------- | ---------------------- | ----------------- |
+| 1     | 3-Bar Thrust Pattern                | Custom pattern detection    | 50% win, -34% return   | 293 trades        |
+| 2     | Manual Features                     | 8 technical indicators      | 52.5% accuracy         | Research only     |
+| 3     | OpenFE Automation                   | 185 auto-generated features | 49.7% accuracy         | Research only     |
+| 4     | tsfresh Time Series                 | 794 time series features    | 51.5% accuracy         | Research only     |
+| 5     | Multi-Timeframe Regimes             | 15m/30m/1h/2h resampling    | 42-45% accuracy        | Research only     |
+| 6     | ML Walk-Forward                     | 6-year backtest             | -4.96% return          | 664 trades        |
+| 7     | Volatility Breakout Strategy        | Multi-TF compression filter | 31.9% win, -95% return | 260 trades        |
+| **8** | **Volatility Compression Research** | **MAE/MFE diagnostic**      | **33.0% favorable**    | **34,375 events** |
 
 **Cumulative Conclusion:** BTC/ETH/SOL cryptocurrency markets show NO exploitable patterns via:
+
 - Pattern recognition
 - Machine learning regime detection
 - Automated feature engineering
@@ -223,17 +233,20 @@ This is the **8th failed approach** in comprehensive BTC trading research:
 All research artifacts saved to `/tmp/volatility_research_output/`:
 
 ### Raw Data
+
 - **`breakout_events_raw.csv`** (34,375 rows)
   - Columns: timestamp, symbol, threshold, direction, entry_price, horizon, mfe, mae, ratio, favorable
   - Full dataset for custom analysis
 
 ### Statistical Summary
+
 - **`breakout_summary_statistics.csv`** (120 rows)
   - Grouped by: symbol, threshold, horizon, direction
   - Metrics: n_events, median_ratio, q25_ratio, q75_ratio, pct_favorable
   - Pre-aggregated for quick reference
 
 ### Visualizations
+
 - **`ratio_distributions.png`**
   - Histograms of MFE/|MAE| ratios per symbol
   - Shows median (green line) vs threshold (red line at 2.0)
@@ -254,6 +267,7 @@ All research artifacts saved to `/tmp/volatility_research_output/`:
 ## Recommendations
 
 ### What NOT to Do
+
 ❌ Trade volatility compression breakouts on crypto
 ❌ Add more technical filters (proven ineffective)
 ❌ Optimize parameters (no configuration works)
@@ -263,22 +277,26 @@ All research artifacts saved to `/tmp/volatility_research_output/`:
 ### What TO Consider
 
 **1. Accept Market Efficiency**
+
 - Crypto markets at 5m-2h timeframes are informationally efficient
 - Pattern-based approaches cannot generate alpha
 - Focus on execution optimization, not signal generation
 
 **2. Alternative Strategy Classes**
+
 - **Market making:** Provide liquidity, earn spread (not directional)
 - **Statistical arbitrage:** Cross-exchange, cross-pair inefficiencies
 - **Momentum pure plays:** Trend-following without regime filters
 - **Fundamental:** On-chain metrics, flow analysis (different data)
 
 **3. Different Markets**
+
 - **Less liquid altcoins:** Higher spreads, potentially exploitable patterns
 - **Traditional forex:** Different market structure, institutional behavior
 - **Futures basis trading:** Funding rate arbitrage
 
 **4. Passive Approaches**
+
 - **Buy & hold:** +66% BTC return in test period vs -95% strategy loss
 - **Dollar-cost averaging:** Reduce timing risk
 - **Index tracking:** Diversified crypto exposure
@@ -298,6 +316,7 @@ All research artifacts saved to `/tmp/volatility_research_output/`:
 **Recommendation: Abandon pattern-based and regime-detection approaches for cryptocurrency trading at sub-daily timeframes.**
 
 The evidence overwhelmingly demonstrates that attempting to predict short-term directional moves from technical patterns is not viable in modern crypto markets. Any perceived patterns are either:
+
 1. Artifacts of data mining (not reproducible)
 2. Already arbitraged away by algorithms
 3. Destroyed by transaction costs

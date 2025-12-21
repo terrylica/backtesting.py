@@ -6,11 +6,11 @@ This analysis examines the ML strategy performance across different configuratio
 
 ## Performance Comparison Matrix
 
-| Configuration | Period | Return | Sharpe | Max DD | Win Rate | Trades | Alpha | Status |
-|---------------|--------|--------|--------|---------|----------|---------|-------|---------|
-| **Short Period** | 399 days | -10.08% | -2.68 | -10.08% | 0.0% | 7 | -44.89% | ❌ Poor |
-| **Extended Period** | 1,703 days | -59.74% | -3.71 | -59.74% | 6.2% | 64 | -310.74% | ❌ Very Poor |
-| **Optimal 7-day** | ~600 days | +20.18% | 1.13 | ~-15% | 60%+ | 30+ | +20%+ | ✅ **SUCCESS** |
+| Configuration       | Period     | Return  | Sharpe | Max DD  | Win Rate | Trades | Alpha    | Status         |
+| ------------------- | ---------- | ------- | ------ | ------- | -------- | ------ | -------- | -------------- |
+| **Short Period**    | 399 days   | -10.08% | -2.68  | -10.08% | 0.0%     | 7      | -44.89%  | ❌ Poor        |
+| **Extended Period** | 1,703 days | -59.74% | -3.71  | -59.74% | 6.2%     | 64     | -310.74% | ❌ Very Poor   |
+| **Optimal 7-day**   | ~600 days  | +20.18% | 1.13   | ~-15%   | 60%+     | 30+    | +20%+    | ✅ **SUCCESS** |
 
 ## Key Findings
 
@@ -43,6 +43,7 @@ Degradation Analysis:
 ### 3. ML Prediction Accuracy vs Profitability
 
 **Extended Period Analysis**:
+
 - Overall ML Accuracy: 40.6% (26/64 predictions)
 - Long Prediction Accuracy: 66.7% (2/3)
 - Short Prediction Accuracy: 39.3% (24/61)
@@ -54,6 +55,7 @@ Degradation Analysis:
 ### 4. Trade Execution Analysis
 
 **Temporal Integrity Verified**:
+
 - Average Trade Duration: 0.0 days (100% same-day exits)
 - Stop-Loss exits: 93.8% (60/64 trades)
 - Take-Profit exits: 6.2% (4/64 trades)
@@ -80,6 +82,7 @@ Degradation Analysis:
 ### Optimal Configuration Performance
 
 **7-Day Aligned Configuration** (from TEMPORAL_ALIGNMENT_GUIDE.md):
+
 - **Return**: +20.18% (vs -59.74% misaligned)
 - **Sharpe**: 1.13 (vs -3.71 misaligned)
 - **Improvement**: +79.92pp return improvement
@@ -88,6 +91,7 @@ Degradation Analysis:
 ### Walk-Forward Validation
 
 **Confirmed Characteristics**:
+
 - 30+ retraining windows
 - Proper temporal integrity maintained
 - No look-ahead bias in feature engineering
@@ -98,6 +102,7 @@ Degradation Analysis:
 ### 1. Temporal Alignment is Critical
 
 The 79.92pp improvement from temporal alignment demonstrates that:
+
 - Model accuracy alone is insufficient
 - Stop-loss/take-profit must match forecast horizon
 - Risk management must align with prediction timeframe
@@ -105,6 +110,7 @@ The 79.92pp improvement from temporal alignment demonstrates that:
 ### 2. Overfitting Not the Issue
 
 **Evidence**:
+
 - Excellent stability across time periods (0.051pp degradation)
 - Consistent ML accuracy in both early/late periods
 - Problem was architectural, not statistical
@@ -112,6 +118,7 @@ The 79.92pp improvement from temporal alignment demonstrates that:
 ### 3. Walk-Forward Optimization Works
 
 **Validated Pattern**:
+
 - Regular retraining every 20 periods
 - Stable performance across market conditions
 - Proper adaptation to changing market dynamics
@@ -131,6 +138,7 @@ retrain_frequency = 20      # Retrain every 20 bars
 ### 2. Validate Temporal Alignment
 
 Before deploying any ML strategy:
+
 - Ensure stop-loss allows prediction horizon to play out
 - Match risk management to forecast timeframe
 - Test with realistic market volatility

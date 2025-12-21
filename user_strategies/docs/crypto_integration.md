@@ -50,10 +50,12 @@ Universal data source adapter that handles both traditional and crypto data with
 #### Parameters
 
 **`source`** (str): Data source type
+
 - `'EURUSD'`: Traditional forex data from backtesting.py
 - `'crypto'`: Cryptocurrency data from Binance via gapless-crypto-data
 
 **For crypto data, additional parameters:**
+
 - **`symbol`** (str): Trading pair (default: 'BTCUSDT')
   - Examples: 'BTCUSDT', 'ETHUSDT', 'ADAUSDT', 'SOLUSDT'
 - **`start`** (str): Start date in 'YYYY-MM-DD' format (default: '2024-01-01')
@@ -64,6 +66,7 @@ Universal data source adapter that handles both traditional and crypto data with
 #### Returns
 
 **pandas.DataFrame**: OHLCV data with DatetimeIndex
+
 - Columns: ['Open', 'High', 'Low', 'Close', 'Volume']
 - Index: DatetimeIndex with trading timestamps
 - Data types: All numeric, properly validated
@@ -73,11 +76,13 @@ Universal data source adapter that handles both traditional and crypto data with
 All Binance spot trading pairs are supported via gapless-crypto-data. Popular examples:
 
 ### Major Cryptocurrencies
+
 - **BTCUSDT**: Bitcoin vs Tether USD
 - **ETHUSDT**: Ethereum vs Tether USD
 - **BNBUSDT**: Binance Coin vs Tether USD
 
 ### Altcoins
+
 - **ADAUSDT**: Cardano vs Tether USD
 - **SOLUSDT**: Solana vs Tether USD
 - **DOTUSDT**: Polkadot vs Tether USD
@@ -108,18 +113,19 @@ The ML walk-forward strategy requires sufficient data for feature engineering:
 
 ### Data Volume by Time Period
 
-| Time Range | Hourly Bars | Suitable For |
-|------------|-------------|--------------|
-| 1 day | 24 | Testing only |
-| 1 week | 168 | Basic ML training |
-| 1 month | 720+ | Full ML strategy |
-| 3 months | 2160+ | Production ready |
+| Time Range | Hourly Bars | Suitable For      |
+| ---------- | ----------- | ----------------- |
+| 1 day      | 24          | Testing only      |
+| 1 week     | 168         | Basic ML training |
+| 1 month    | 720+        | Full ML strategy  |
+| 3 months   | 2160+       | Production ready  |
 
 ## Error Handling & Fallbacks
 
 The data source adapter includes robust error handling:
 
 ### Package Availability
+
 ```python
 # If gapless-crypto-data is not installed
 data = get_data_source('crypto', symbol='BTCUSDT')
@@ -127,6 +133,7 @@ data = get_data_source('crypto', symbol='BTCUSDT')
 ```
 
 ### Network/API Errors
+
 ```python
 # If crypto data fetch fails
 data = get_data_source('crypto', symbol='INVALID_SYMBOL')
@@ -134,6 +141,7 @@ data = get_data_source('crypto', symbol='INVALID_SYMBOL')
 ```
 
 ### Data Validation
+
 - **Column validation**: Ensures OHLCV format
 - **Data type validation**: Numeric columns verified
 - **Index validation**: DatetimeIndex required
@@ -144,21 +152,23 @@ data = get_data_source('crypto', symbol='INVALID_SYMBOL')
 ### Empirical Results (192 hourly bars)
 
 | Data Source | Return | Sharpe | Max DD | Win Rate | Trades |
-|-------------|--------|--------|--------|----------|--------|
+| ----------- | ------ | ------ | ------ | -------- | ------ |
 | EURUSD      | +0.27% | 2.59   | -0.14% | 61.1%    | 18     |
 | BTCUSDT     | +0.09% | 6.18   | -0.19% | 75.0%    | 12     |
 
-*Note: Results vary significantly with data period and market conditions*
+_Note: Results vary significantly with data period and market conditions_
 
 ## Best Practices
 
 ### 1. Data Period Selection
+
 ```python
 # Use adequate data for ML training
 data = get_data_source('crypto', symbol='BTCUSDT', start='2024-01-01', end='2024-02-01')  # 1 month
 ```
 
 ### 2. Parameter Adjustment for Crypto
+
 ```python
 # Crypto markets are more volatile - adjust parameters
 bt = Backtest(crypto_data, MLWalkForwardStrategy,
@@ -171,11 +181,13 @@ stats = bt.run(n_train=100, retrain_frequency=10)  # Retrain every 10 periods
 ```
 
 ### 3. Commission Rates
+
 - **Forex (EURUSD)**: 0.0002 (2bp) typical
 - **Crypto**: 0.0008 (8bp) typical for spot trading
 - **Crypto Futures**: 0.0004 (4bp) for USDⓈ-M perpetuals
 
 ### 4. Position Sizing
+
 ```python
 # Crypto is more volatile - consider smaller position sizes
 class CryptoMLStrategy(MLWalkForwardStrategy):
@@ -185,12 +197,14 @@ class CryptoMLStrategy(MLWalkForwardStrategy):
 ## Troubleshooting
 
 ### ImportError: gapless-crypto-data
+
 ```bash
 # Install the crypto data package
 uv add gapless-crypto-data
 ```
 
 ### Insufficient Data Error
+
 ```python
 # Error: Feature engineering returns 0 rows
 # Solution: Use more data periods
@@ -198,6 +212,7 @@ data = get_data_source('crypto', symbol='BTCUSDT', start='2024-01-01', end='2024
 ```
 
 ### Network/Download Issues
+
 ```python
 # Check internet connection and symbol validity
 # All Binance spot pairs supported - verify symbol exists on exchange
@@ -206,6 +221,7 @@ data = get_data_source('crypto', symbol='BTCUSDT', start='2024-01-01', end='2024
 ## Advanced Usage
 
 ### Custom Date Ranges
+
 ```python
 # Historical testing
 data = get_data_source('crypto', symbol='BTCUSDT', start='2023-01-01', end='2023-12-31')
@@ -215,6 +231,7 @@ data = get_data_source('crypto', symbol='ETHUSDT', start='2024-09-01', end='2024
 ```
 
 ### Multiple Symbol Analysis
+
 ```python
 symbols = ['BTCUSDT', 'ETHUSDT', 'ADAUSDT', 'SOLUSDT']
 results = {}

@@ -1,5 +1,5 @@
-Alternatives
-------------
+## Alternatives
+
 The thing with backtesting is, unless you dug into the dirty details yourself,
 you can't rely on execution correctness, and you risk losing your house.
 In addition, everyone has their own preconveived ideas about how a mechanical
@@ -10,7 +10,7 @@ If after reviewing the docs and examples perchance you find
 [_Backtesting.py_](https://kernc.github.io/backtesting.py) not your cup of tea,
 kindly have a look at some similar alternative Python backtesting frameworks:
 
--  [AutoTrader](https://github.com/kieran-mackle/AutoTrader) -
+- [AutoTrader](https://github.com/kieran-mackle/AutoTrader) -
   an automated trading framework with an emphasis on cryptocurrency markets
   that includes a [robust backtesting API](https://github.com/kieran-mackle/AutoTrader/blob/main/docs/source/tutorials/backtesting.md)
 - [bt](http://pmorissette.github.io/bt/) -
@@ -61,7 +61,6 @@ kindly have a look at some similar alternative Python backtesting frameworks:
   and also deploy those same strategies live, with no code changes.
 - [LiuAlgoTrader](https://amor71.github.io/LiuAlgoTrader/) -
   A scalable, multi-process ML-ready framework for effective algorithmic trading.
-
 
 #### Obsolete / Unmaintained
 

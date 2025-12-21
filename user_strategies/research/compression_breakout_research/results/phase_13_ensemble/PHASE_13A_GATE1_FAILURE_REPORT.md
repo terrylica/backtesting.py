@@ -13,6 +13,7 @@
 **HYPOTHESIS PARTIALLY VALIDATED**: Trend filtering improves win rate (+3.4pp) but insufficient for viability.
 
 **Result**: Trend-filtered breakout strategy shows marginal improvement over baseline:
+
 - Win rate: 39.7% (vs baseline 36.3%) → **+3.4pp improvement**
 - Return: -100.00% (vs baseline -100.00%) → **No improvement**
 - Trades: 863 (vs baseline 846) → **+17 more trades**
@@ -26,11 +27,13 @@
 ## Test Configuration
 
 ### Dataset
+
 - Asset: ETH (ETHUSDT 5-minute)
 - Period: 2022-01-01 to 2025-09-30
 - Bars: 394,272 (3.75 years)
 
 ### Strategy Parameters
+
 - Volatility threshold: 0.10 (10th percentile, multi-timeframe)
 - Breakout period: 20 bars
 - Stop: 2.0 × ATR
@@ -42,13 +45,13 @@
 
 ## Results Comparison
 
-| Metric | Phase 10D Baseline | Phase 13A (Trend Filter) | Delta |
-|--------|-------------------|-------------------------|-------|
-| Return [%] | -100.00 | -100.00 | 0.00pp |
-| # Trades | 846 | 863 | **+17** |
-| Win Rate [%] | 36.3 | 39.7 | **+3.4pp** |
-| Sharpe Ratio | -23.33 | -13.68 | **+9.65** |
-| Max DD [%] | -100.00 | -100.00 | 0.00pp |
+| Metric       | Phase 10D Baseline | Phase 13A (Trend Filter) | Delta      |
+| ------------ | ------------------ | ------------------------ | ---------- |
+| Return [%]   | -100.00            | -100.00                  | 0.00pp     |
+| # Trades     | 846                | 863                      | **+17**    |
+| Win Rate [%] | 36.3               | 39.7                     | **+3.4pp** |
+| Sharpe Ratio | -23.33             | -13.68                   | **+9.65**  |
+| Max DD [%]   | -100.00            | -100.00                  | 0.00pp     |
 
 ### Interpretation
 
@@ -62,10 +65,10 @@
 
 ## Gate 1 Criteria Evaluation
 
-| Criterion | Threshold | Actual | Status |
-|-----------|-----------|--------|--------|
-| Win Rate > 40% | 40.0% | 39.7% | ❌ FAIL (-0.3pp shortfall) |
-| Trades ≥ 100 | 100 | 863 | ✅ PASS (+763 surplus) |
+| Criterion      | Threshold | Actual | Status                     |
+| -------------- | --------- | ------ | -------------------------- |
+| Win Rate > 40% | 40.0%     | 39.7%  | ❌ FAIL (-0.3pp shortfall) |
+| Trades ≥ 100   | 100       | 863    | ✅ PASS (+763 surplus)     |
 
 **Overall**: ❌ **GATE 1 FAIL** - 1/2 criteria failed
 
@@ -76,11 +79,13 @@
 ### Why Trend Filter Failed to Meet Threshold
 
 **Hypothesis**:
+
 - Premise: Counter-trend breakouts are less reliable
 - Logic: Filtering them should improve win rate significantly
 - Expected: Win rate > 40% (ideally 45-50%)
 
 **Reality**:
+
 - Trend filter added: 39.7% win rate
 - Improvement: Only +3.4pp
 - Conclusion: **Most breakouts occur in trend direction already**
@@ -90,11 +95,13 @@
 **Volatility compression zones remain weak predictive signals even with trend confirmation.**
 
 Evidence across all phases:
+
 1. **Phase 10D (breakout)**: 36.3% win rate, -100% return
 2. **Phase 12A (mean reversion)**: 28.7% win rate, -99.36% return
 3. **Phase 13A (trend filter)**: 39.7% win rate, -100% return
 
 **All variations perform worse than random (50% win rate)**, suggesting:
+
 - Compression zones are ANTI-CORRELATED with profitable moves
 - Adding filters reduces noise but cannot fix broken signal
 - Entry timing is fundamentally flawed regardless of direction or filters
@@ -108,16 +115,19 @@ Evidence across all phases:
 **Explanation**:
 
 ### 1. Loss Asymmetry
+
 - Winning trades: Average small gains
 - Losing trades: Hit 2ATR stops or max drawdown
 - Result: Losses exceed wins despite better win rate
 
 ### 2. Trend Filter Blocks Winners
+
 - Trend filter blocks counter-trend entries
 - Some counter-trend setups may have been winners
 - Net effect: Fewer big losses AND fewer big wins
 
 ### 3. Risk-Reward Mismatch
+
 - Current: 2ATR stop, 4ATR target (2:1 reward/risk)
 - Compression breakouts: Don't run far enough to hit 4ATR
 - Result: Stops hit more often than targets despite trend alignment
@@ -128,11 +138,11 @@ Evidence across all phases:
 
 ### Phase Evolution
 
-| Phase | Strategy | Win Rate | Return | Key Finding |
-|-------|----------|----------|--------|-------------|
-| 10D | Compression breakout | 36.3% | -100.00% | Regime filtering fails |
-| 12A | Mean reversion | 28.7% | -99.36% | Fading worse than following |
-| 13A | Trend filter | **39.7%** | -100.00% | Marginal improvement insufficient |
+| Phase | Strategy             | Win Rate  | Return   | Key Finding                       |
+| ----- | -------------------- | --------- | -------- | --------------------------------- |
+| 10D   | Compression breakout | 36.3%     | -100.00% | Regime filtering fails            |
+| 12A   | Mean reversion       | 28.7%     | -99.36%  | Fading worse than following       |
+| 13A   | Trend filter         | **39.7%** | -100.00% | Marginal improvement insufficient |
 
 ### Insights Gained
 
@@ -149,6 +159,7 @@ Evidence across all phases:
 ### Option A: Abandon Compression Approach ⭐ STRONGLY RECOMMENDED
 
 **Rationale**:
+
 - 13 phases of research (Phase 8-13A)
 - Three different approaches tested (breakout, mean reversion, trend filter)
 - Best result: 39.7% win rate (still worse than random)
@@ -161,11 +172,13 @@ Evidence across all phases:
 ### Option B: Continue Phase 13 Ensemble (Add Volume + Momentum)
 
 **Rationale**:
+
 - Trend filter showed directional improvement (+3.4pp)
 - May need multiple filters to reach viability
 - Volume and momentum could add +5-10pp more
 
 **Counter-evidence**:
+
 - Each filter reduces trade count
 - Already 863 trades → may drop to <100 with more filters
 - Win rate needs +10.3pp to reach 50% (ambitious)
@@ -177,11 +190,13 @@ Evidence across all phases:
 ### Option C: Relax Gate 1 Threshold
 
 **Rationale**:
+
 - 39.7% is very close to 40% (-0.3pp)
 - Statistical noise could explain shortfall
 - Allow Phase 13B to test with relaxed criteria
 
 **Counter-evidence**:
+
 - -100% return unchanged despite win rate improvement
 - 39.7% still worse than random (50%)
 - No evidence more filters will reach 50%+
@@ -192,6 +207,7 @@ Evidence across all phases:
 ### Option D: Test Alternative Entry Signals
 
 **Rationale**:
+
 - Compression detection may be wrong, not just insufficient
 - Test traditional signals: MA crossovers, RSI divergence, volume spikes
 - Use validated risk management from current research
@@ -206,6 +222,7 @@ Evidence across all phases:
 ### Immediate Action: ABORT Phase 13
 
 **Evidence-based decision**:
+
 1. Breakout following: 36.3% win rate, -100% return
 2. Mean reversion: 28.7% win rate, -99.36% return
 3. Trend filter: 39.7% win rate, -100% return
@@ -249,12 +266,14 @@ Evidence across all phases:
 ## Files Generated
 
 ### Phase 13A Implementation
+
 - `scripts/10_ensemble_trend_filter.py` (trend-filtered strategy)
 - `PHASE_13_ENSEMBLE_IMPLEMENTATION.md` (updated to v1.1.0 with results)
 - `results/phase_13_ensemble/PHASE_13A_GATE1_FAILURE_REPORT.md` (this file)
 - `results/phase_13_ensemble/phase_13a_trend_filter.csv` (metrics)
 
 ### Phase 13 Status
+
 - **Phase 13A**: Complete (FAILED at Gate 1)
 - **Phase 13B**: Not executed (Gate 1 failed)
 - **Phase 13C**: Not executed (Gate 1 failed)
@@ -266,16 +285,16 @@ Evidence across all phases:
 
 ### Complete Timeline
 
-| Phase | Date | Focus | Outcome |
-|-------|------|-------|---------|
-| 8 | 2025-09-XX | MAE/MFE compression analysis | Compression zones identified |
-| 9 | 2025-09-XX | Streak entropy analysis | Entropy patterns discovered |
-| 10 | 2025-09-XX | Regime-aware trading | +0.28% on 200k bars (bull market only) |
-| 11 | 2025-10-04 | Extended validation | -57.07% on 394k bars (3.75 years) |
-| 11B | 2025-10-04 | Diagnostic analysis | Only 10 trades due to regime lockout |
-| 11C | 2025-10-04 | Cross-asset validation | Universal failure (ETH/BTC/SOL -100%) |
-| 12A | 2025-10-04 | Mean reversion pivot | 28.7% win rate (WORSE than baseline) |
-| 13A | 2025-10-05 | Trend filter ensemble | 39.7% win rate (insufficient) |
+| Phase | Date       | Focus                        | Outcome                                |
+| ----- | ---------- | ---------------------------- | -------------------------------------- |
+| 8     | 2025-09-XX | MAE/MFE compression analysis | Compression zones identified           |
+| 9     | 2025-09-XX | Streak entropy analysis      | Entropy patterns discovered            |
+| 10    | 2025-09-XX | Regime-aware trading         | +0.28% on 200k bars (bull market only) |
+| 11    | 2025-10-04 | Extended validation          | -57.07% on 394k bars (3.75 years)      |
+| 11B   | 2025-10-04 | Diagnostic analysis          | Only 10 trades due to regime lockout   |
+| 11C   | 2025-10-04 | Cross-asset validation       | Universal failure (ETH/BTC/SOL -100%)  |
+| 12A   | 2025-10-04 | Mean reversion pivot         | 28.7% win rate (WORSE than baseline)   |
+| 13A   | 2025-10-05 | Trend filter ensemble        | 39.7% win rate (insufficient)          |
 
 ### Key Findings
 
@@ -301,6 +320,7 @@ Evidence across all phases:
 Per Phase 13 SLOs, errors propagate without fallback.
 
 **Gate 1 failure triggers**:
+
 ```python
 raise RuntimeError("GATE 1 FAIL: Trend filter insufficient, abort Phase 13")
 ```
@@ -312,17 +332,21 @@ raise RuntimeError("GATE 1 FAIL: Trend filter insufficient, abort Phase 13")
 ## References
 
 **Supersedes**:
+
 - Phase 13 Implementation Plan (FAILED at Gate 1)
 
 **Validates**:
+
 - Phase 11 finding: Compression approach universally broken
 - Phase 12A finding: Mean reversion makes it worse
 
 **Builds on**:
+
 - Phase 10D baseline: 36.3% win rate, -100% return
 - Cross-asset analysis: Universal failure confirmed
 
 **Contradicts**:
+
 - Hypothesis: Multi-factor ensemble can rescue compression signals
 - Reality: Trend filter improves by +3.4pp but still fails Gate 1
 

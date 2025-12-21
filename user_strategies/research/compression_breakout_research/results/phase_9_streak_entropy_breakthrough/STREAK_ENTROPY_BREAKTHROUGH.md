@@ -24,8 +24,8 @@
 
 ### Runs Test Results (Randomness Detection)
 
-| Symbol | P-value | Z-stat | Interpretation | Verdict |
-|--------|---------|--------|----------------|---------|
+| Symbol  | P-value    | Z-stat | Interpretation           | Verdict      |
+| ------- | ---------- | ------ | ------------------------ | ------------ |
 | **BTC** | **0.0000** | -71.21 | CLUSTERED (too few runs) | ✓ STRUCTURED |
 | **ETH** | **0.0000** | -51.90 | CLUSTERED (too few runs) | ✓ STRUCTURED |
 | **SOL** | **0.0000** | -60.29 | CLUSTERED (too few runs) | ✓ STRUCTURED |
@@ -46,12 +46,14 @@ SOL        169       29        5.8x   ✓ EXTREME
 ```
 
 **What This Means:**
+
 - Random chance predicts max unfavorable streaks of ~26-29 consecutive events
 - **Observed:** 169-177 consecutive unfavorable events
 - This is **6x longer than chance** would explain
 
 **Statistical Significance:**
 When shuffling the same data (preserving 33% win rate but randomizing order):
+
 - Shuffled max streak: 20-26 events
 - Actual max streak: 169-177 events
 - **Factor: 7-9x difference**
@@ -65,10 +67,10 @@ This confirms clustering is NOT due to the 33% win rate, but due to **temporal s
 ### Mean Streak Lengths
 
 | Symbol | Favorable Streaks | Unfavorable Streaks | Balance Ratio |
-|--------|------------------|---------------------|---------------|
-| BTC | 3.66 bars | 7.27 bars | 0.50 |
-| ETH | 3.50 bars | 6.89 bars | 0.51 |
-| SOL | 3.36 bars | 7.19 bars | 0.47 |
+| ------ | ----------------- | ------------------- | ------------- |
+| BTC    | 3.66 bars         | 7.27 bars           | 0.50          |
+| ETH    | 3.50 bars         | 6.89 bars           | 0.51          |
+| SOL    | 3.36 bars         | 7.19 bars           | 0.47          |
 
 **Key Insight:** Unfavorable streaks are **2x longer** than favorable streaks on average.
 
@@ -93,6 +95,7 @@ Date           Symbols Affected
 **Total Dates with Multi-Symbol Regimes:** 178 dates (out of 347 days analyzed)
 
 **Interpretation:** Unfavorable regimes are **market-wide phenomena**, not symbol-specific. This suggests:
+
 1. Common market drivers (VIX spikes, liquidity crises, de-risking)
 2. Regime shifts affect entire crypto market simultaneously
 3. Can use one symbol's streak to predict others' behavior
@@ -105,11 +108,11 @@ Date           Symbols Affected
 
 ### Longest Unfavorable Regimes
 
-| Symbol | Start | End | Duration | Events |
-|--------|-------|-----|----------|--------|
-| BTC | 2025-07-25 | 2025-07-26 | ~19 hours | 177 |
-| ETH | 2024-11-24 | 2024-11-29 | ~5 days | 171 |
-| SOL | 2024-11-24 | 2024-11-29 | ~5 days | 169 |
+| Symbol | Start      | End        | Duration  | Events |
+| ------ | ---------- | ---------- | --------- | ------ |
+| BTC    | 2025-07-25 | 2025-07-26 | ~19 hours | 177    |
+| ETH    | 2024-11-24 | 2024-11-29 | ~5 days   | 171    |
+| SOL    | 2024-11-24 | 2024-11-29 | ~5 days   | 169    |
 
 ### Example: November 2024 Multi-Day Regime
 
@@ -133,13 +136,13 @@ Market Conditions (hypothesized):
 
 **Top 10 Most Structured Configurations** (ranked by runs test p-value):
 
-| Symbol | Threshold | Horizon | Direction | N Events | P-value | Max Streak | Clustering |
-|--------|-----------|---------|-----------|----------|---------|------------|------------|
-| SOL | 20% | 100 bars | Bullish | 590 | 0.0000 | 19 | CLUSTERED |
-| SOL | 20% | 100 bars | Bearish | 404 | 0.0000 | 20 | CLUSTERED |
-| ETH | 20% | 50 bars | Bullish | 425 | 0.0000 | 15 | CLUSTERED |
-| ETH | 20% | 100 bars | Bullish | 425 | 0.0000 | 33 | CLUSTERED |
-| SOL | 10% | 50 bars | Bullish | 253 | 0.0000 | 23 | CLUSTERED |
+| Symbol | Threshold | Horizon  | Direction | N Events | P-value | Max Streak | Clustering |
+| ------ | --------- | -------- | --------- | -------- | ------- | ---------- | ---------- |
+| SOL    | 20%       | 100 bars | Bullish   | 590      | 0.0000  | 19         | CLUSTERED  |
+| SOL    | 20%       | 100 bars | Bearish   | 404      | 0.0000  | 20         | CLUSTERED  |
+| ETH    | 20%       | 50 bars  | Bullish   | 425      | 0.0000  | 15         | CLUSTERED  |
+| ETH    | 20%       | 100 bars | Bullish   | 425      | 0.0000  | 33         | CLUSTERED  |
+| SOL    | 10%       | 50 bars  | Bullish   | 253      | 0.0000  | 23         | CLUSTERED  |
 
 **Insight:** ALL tested configurations show clustering (p < 0.01). Structure is **universal across parameters**.
 
@@ -175,10 +178,12 @@ Market Conditions (hypothesized):
 ### Regime-Aware Compression Breakout System
 
 **Step 1: Real-Time Streak Monitoring**
+
 - Track last N breakout outcomes across BTC/ETH/SOL
 - Calculate rolling streak length (consecutive favorable vs unfavorable)
 
 **Step 2: Regime Classification**
+
 ```python
 if current_unfavorable_streak >= 5:
     regime = "UNFAVORABLE"
@@ -192,6 +197,7 @@ else:
 ```
 
 **Step 3: Cross-Symbol Confirmation**
+
 ```python
 if BTC_streak >= 5 AND (ETH_streak >= 5 OR SOL_streak >= 5):
     regime = "MARKET-WIDE UNFAVORABLE"
@@ -199,6 +205,7 @@ if BTC_streak >= 5 AND (ETH_streak >= 5 OR SOL_streak >= 5):
 ```
 
 **Step 4: Regime Flip Detection**
+
 ```python
 if previous_regime == "UNFAVORABLE" and current_outcome == "FAVORABLE":
     # First favorable outcome after long unfavorable streak
@@ -213,6 +220,7 @@ if previous_regime == "UNFAVORABLE" and current_outcome == "FAVORABLE":
 ## Expected Performance Improvement
 
 ### Naive Approach (No Regime Detection)
+
 ```
 Total breakouts: 1,000
 Favorable rate: 33%
@@ -222,6 +230,7 @@ Net: Losing strategy (33% << 50%)
 ```
 
 ### Regime-Aware Approach
+
 ```
 Total breakouts: 1,000
 Unfavorable regime events (skip): 670 (detected via streak)
@@ -246,6 +255,7 @@ By **avoiding unfavorable regimes** (detected via streaks ≥5), we concentrate 
 ### If Sequences Were Random
 
 **Expected behavior with 33% win rate:**
+
 - Streaks roughly geometric distribution
 - Max streak (95%): ~26-29 consecutive
 - Roughly equal favorable/unfavorable streak lengths
@@ -254,6 +264,7 @@ By **avoiding unfavorable regimes** (detected via streaks ≥5), we concentrate 
 ### Observed (Actual Data)
 
 **Extreme non-random behavior:**
+
 - Max streaks: 169-177 (6x random expectation)
 - Unfavorable streaks 2x longer than favorable
 - Strong cross-symbol regime alignment
@@ -286,17 +297,17 @@ By **avoiding unfavorable regimes** (detected via streaks ≥5), we concentrate 
 
 This is the **9th approach tested**, and the **FIRST to find exploitable structure**:
 
-| # | Approach | Finding | Outcome |
-|---|----------|---------|---------|
-| 1 | 3-Bar Pattern | 50% win rate | ✗ Random |
-| 2 | Manual Features | 52.5% accuracy | ✗ Random |
-| 3 | OpenFE (185 features) | 49.7% accuracy | ✗ Random |
-| 4 | tsfresh (794 features) | 51.5% accuracy | ✗ Random |
-| 5 | Multi-Timeframe | 42-45% accuracy | ✗ Anti-predictive |
-| 6 | ML Walk-Forward | -4.96% return | ✗ Failed |
-| 7 | Volatility Breakout | 31.9% win, -95% return | ✗ Failed |
-| 8 | MAE/MFE Analysis | 33% favorable rate | ✗ Seemed random |
-| **9** | **Streak Entropy** | **P < 0.0001 clustering** | **✓ STRUCTURE FOUND** |
+| #     | Approach               | Finding                   | Outcome               |
+| ----- | ---------------------- | ------------------------- | --------------------- |
+| 1     | 3-Bar Pattern          | 50% win rate              | ✗ Random              |
+| 2     | Manual Features        | 52.5% accuracy            | ✗ Random              |
+| 3     | OpenFE (185 features)  | 49.7% accuracy            | ✗ Random              |
+| 4     | tsfresh (794 features) | 51.5% accuracy            | ✗ Random              |
+| 5     | Multi-Timeframe        | 42-45% accuracy           | ✗ Anti-predictive     |
+| 6     | ML Walk-Forward        | -4.96% return             | ✗ Failed              |
+| 7     | Volatility Breakout    | 31.9% win, -95% return    | ✗ Failed              |
+| 8     | MAE/MFE Analysis       | 33% favorable rate        | ✗ Seemed random       |
+| **9** | **Streak Entropy**     | **P < 0.0001 clustering** | **✓ STRUCTURE FOUND** |
 
 **Lesson:** Aggregate statistics (33% favorable) **masked** the sequential structure. Only by analyzing **streaks** did we discover the hidden regimes.
 
@@ -334,6 +345,7 @@ This is the **9th approach tested**, and the **FIRST to find exploitable structu
    - Implement regime flip confirmation (require 2-3 favorable outcomes)
 
 2. **Position Sizing by Regime Confidence**
+
    ```python
    if favorable_streak == 3:
        position_size = 0.5x  # Early favorable regime
@@ -356,6 +368,7 @@ This is the **9th approach tested**, and the **FIRST to find exploitable structu
 **Status:** ✓ **EXPLOITABLE STRUCTURE DISCOVERED**
 
 After 8 failed approaches and 34,375 analyzed events, we've found **the hidden order in apparent chaos**:
+
 - Compression breakouts DO work, but only during favorable regimes
 - Favorable/unfavorable regimes are **detectable via streaks**
 - Regime detection enables **selective trading**, transforming 33% aggregate performance into potentially 55-60% regime-filtered performance
@@ -363,6 +376,7 @@ After 8 failed approaches and 34,375 analyzed events, we've found **the hidden o
 ### For Crypto Trading Generally
 
 **Regime-based framework applies beyond compression breakouts:**
+
 - Any mean-reversion vs momentum strategy
 - Entry timing across different volatility regimes
 - Risk-on vs risk-off crypto market cycles
@@ -370,6 +384,7 @@ After 8 failed approaches and 34,375 analyzed events, we've found **the hidden o
 ### Scientific Contribution
 
 **"Deriving order from chaos":**
+
 - Demonstrated that aggregate failure (33%) can hide sequential success (regime-dependent)
 - Validated entropy analysis as discovery tool for hidden market structure
 - Showed cross-asset regime synchronization in crypto markets
@@ -379,16 +394,19 @@ After 8 failed approaches and 34,375 analyzed events, we've found **the hidden o
 ## Files & Outputs
 
 ### Data Files
+
 - **`breakout_events_raw.csv`** (34,375 events) - Original data
 - **`streak_analysis_summary.csv`** - Per-symbol statistics
 - **`configuration_entropy_rankings.csv`** - All 120 configs ranked by structure
 - **`unfavorable_regimes.csv`** - All 1,036 detected regime periods
 
 ### Visualizations
+
 - **`streak_distributions.png`** - Histograms showing 6x excess vs random
 - **`regime_timeline.png`** - Visual calendar of regimes over time
 
 ### Analysis Code
+
 - **`/tmp/streak_entropy_analysis.py`** - Complete implementation
 - **`/tmp/volatility_compression_research.py`** - Original MAE/MFE analysis
 
