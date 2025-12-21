@@ -1,0 +1,9 @@
+metric,long_only,short_only
+Trades,82.0,54.0
+Return [%],-52.63,-38.01
+Win Rate [%],46.3,44.4
+Total MFE [%],13.44,11.29
+Captured [%],0.53,1.33
+Agg Eff [%],3.9,11.8
+Mean Eff,-0.23,-0.279
+Median Eff,0.187,0.25
